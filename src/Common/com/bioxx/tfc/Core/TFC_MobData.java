@@ -14,8 +14,8 @@ public class TFC_MobData
 	public static final int WOLF_HEALTH = 2000;
 
 	//Spider
-	public static final int SPIDER_DAMAGE = 80;
-	public static final int SPIDER_HEALTH = 1800;
+	public static final int SPIDER_DAMAGE = 30;
+	public static final int SPIDER_HEALTH = 800;
 
 	//PigZombie
 	public static final int PIG_ZOMBIE_DAMAGE = 200;
@@ -50,7 +50,7 @@ public class TFC_MobData
 	public static final int SLIME_HEALTH = 350;
 
 	//Skeleton
-	public static final int SKELETON_HEALTH = 1500;
+	public static final int SKELETON_HEALTH = 400;
 
 	//Ghast
 	public static final int GHAST_HEALTH = 1000;

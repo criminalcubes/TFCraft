@@ -52,40 +52,49 @@ public class EntityDamageHandler
 
 		if(event.source == DamageSource.onFire)
 		{
-			event.ammount = 50;
+			//event.ammount = 50;
+			if (event.entityLiving.getHealth()-50 >= 0) event.entityLiving.setHealth(event.entityLiving.getHealth()-50); else event.entityLiving.setHealth(0);
 		}
 		else if(event.source == DamageSource.fall)
 		{
 			float healthMod = TFC_Core.getEntityMaxHealth(entity)/1000f;
-			event.ammount *= 80*healthMod;
+			//event.ammount *= 80*healthMod;
+			if (event.entityLiving.getHealth()-event.ammount*80*healthMod >= 0) event.entityLiving.setHealth(event.entityLiving.getHealth()-event.ammount*80*healthMod); else event.entityLiving.setHealth(0);
 		}
 		else if(event.source == DamageSource.drown)
 		{
-			event.ammount = 50;
+			//event.ammount = 50;
+			if (event.entityLiving.getHealth()-50 >= 0) event.entityLiving.setHealth(event.entityLiving.getHealth()-50); else event.entityLiving.setHealth(0);
 		}
 		else if(event.source == DamageSource.lava)
 		{
-			event.ammount = 100;
+			//event.ammount = 100;
+			if (event.entityLiving.getHealth()-100 >= 0) event.entityLiving.setHealth(event.entityLiving.getHealth()-100); else event.entityLiving.setHealth(0);
 		}
 		else if(event.source == DamageSource.inWall)
 		{
-			event.ammount = 100;
+			//event.ammount = 100;
+			if (event.entityLiving.getHealth()-100 >= 0) event.entityLiving.setHealth(event.entityLiving.getHealth()-100); else event.entityLiving.setHealth(0);
 		}
 		else if(event.source == DamageSource.fallingBlock)
 		{
-			event.ammount = 100;
+			//event.ammount = 100;
+			if (event.entityLiving.getHealth()-100 >= 0) event.entityLiving.setHealth(event.entityLiving.getHealth()-100); else event.entityLiving.setHealth(0);
 		}
 		else if(event.source.isExplosion())
 		{
-			event.ammount *= 30;
+			//event.ammount *= 30;
+			if (event.entityLiving.getHealth()-event.ammount*30 >= 0) event.entityLiving.setHealth(event.entityLiving.getHealth()-event.ammount*30); else event.entityLiving.setHealth(0);
 		}
 		else if (event.source == DamageSource.magic && entity.getHealth() > 25)
 		{
-			event.ammount = 25;
+			//event.ammount = 25;
+			if (event.entityLiving.getHealth()-25 >= 0) event.entityLiving.setHealth(event.entityLiving.getHealth()-25); else event.entityLiving.setHealth(0);
 		}
 		else if ("player".equals(event.source.damageType) || "mob".equals(event.source.damageType) || "arrow".equals(event.source.damageType))
 		{
-			event.ammount = applyArmorCalculations(entity, event.source, event.ammount);
+			//event.ammount = applyArmorCalculations(entity, event.source, event.ammount);
+			if (event.entityLiving.getHealth()-applyArmorCalculations(entity, event.source, event.ammount) >= 0) event.entityLiving.setHealth(event.entityLiving.getHealth()-applyArmorCalculations(entity, event.source, event.ammount)); else event.entityLiving.setHealth(0);
 			if ("arrow".equals(event.source.damageType))
 			{
 				Entity e = ((EntityDamageSourceIndirect)event.source).getSourceOfDamage();
@@ -338,10 +347,12 @@ public class EntityDamageHandler
 						target.setFire(1);
 					}
 
-					boolean entityAttacked = target.attackEntityFrom(DamageSource.causePlayerDamage(player), damageAmount);
+					//need for check Towny no-pvp flag
+					boolean entityAttacked = target.attackEntityFrom(DamageSource.causePlayerDamage(player), 0);
 
 					if (entityAttacked)
 					{
+						target.attackEntityFrom(DamageSource.causePlayerDamage(player), damageAmount);
 						if (knockback > 0)
 						{
 							target.addVelocity(-MathHelper.sin(player.rotationYaw * (float)Math.PI / 180.0F) * knockback * 0.5F, 0.1D, 
