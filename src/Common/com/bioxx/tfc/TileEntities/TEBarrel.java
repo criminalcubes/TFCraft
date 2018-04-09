@@ -198,7 +198,7 @@ public class TEBarrel extends NetworkTileEntity implements IInventory
 	@Override
 	public boolean isUseableByPlayer(EntityPlayer entityplayer)
 	{
-		return false;
+		return this.worldObj.getTileEntity(this.xCoord, this.yCoord, this.zCoord) == this && entityplayer.getDistanceSq(this.xCoord + 0.5, this.yCoord + 0.5, this.zCoord + 0.5) < 64;
 	}
 
 	@Override
