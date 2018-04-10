@@ -51,9 +51,9 @@ public class ContainerFoodPrep extends ContainerTFC
 	}
 
 	@Override
-	public boolean canInteractWith(EntityPlayer var1)
+	public boolean canInteractWith(EntityPlayer entityplayer)
 	{
-		return true;
+		return te.isUseableByPlayer(entityplayer);
 	}
 
 	protected void layoutContainer(IInventory playerInventory, IInventory chestInventory, int xSize, int ySize)

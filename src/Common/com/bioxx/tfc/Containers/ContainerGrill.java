@@ -39,11 +39,10 @@ public class ContainerGrill extends ContainerTFC
 
 		PlayerInventory.buildInventoryLayout(this, inventoryplayer, 8, 90, false, true);
 	}
-
 	@Override
 	public boolean canInteractWith(EntityPlayer entityplayer)
 	{
-		return true;
+		return fire.isUseableByPlayer(entityplayer);
 	}
 
 	@Override

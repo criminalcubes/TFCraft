@@ -63,6 +63,12 @@ public class ContainerAnvil extends ContainerTFC
 	}
 
 	@Override
+	public boolean canInteractWith(EntityPlayer entityplayer)
+	{
+		return anvil.isUseableByPlayer(entityplayer);
+	}
+
+	@Override
 	public ItemStack transferStackInSlotTFC(EntityPlayer player, int slotNum)
 	{
 		ItemStack origStack = null;

@@ -42,7 +42,7 @@ public class ContainerCrucible extends ContainerTFC
 	@Override
 	public boolean canInteractWith(EntityPlayer entityplayer)
 	{
-		return true;
+		return te.isUseableByPlayer(entityplayer);
 	}
 
 	@Override

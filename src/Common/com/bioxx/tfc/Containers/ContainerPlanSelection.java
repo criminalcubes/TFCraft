@@ -19,6 +19,12 @@ public class ContainerPlanSelection extends ContainerTFC
 	}
 
 	@Override
+	public boolean canInteractWith(EntityPlayer entityplayer)
+	{
+		return anvil.isUseableByPlayer(entityplayer);
+	}
+
+	@Override
 	public void detectAndSendChanges()
 	{
 		super.detectAndSendChanges();
