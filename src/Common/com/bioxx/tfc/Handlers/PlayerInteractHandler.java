@@ -1,10 +1,8 @@
 package com.bioxx.tfc.Handlers;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 
+import com.bioxx.tfc.TileEntities.NetworkTileEntity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -28,6 +26,7 @@ import com.bioxx.tfc.Core.Player.FoodStatsTFC;
 import com.bioxx.tfc.api.TFCBlocks;
 import com.bioxx.tfc.api.TFCItems;
 import com.bioxx.tfc.api.Util.Helper;
+import net.minecraftforge.event.world.BlockEvent;
 
 public class PlayerInteractHandler
 {
@@ -120,4 +119,33 @@ public class PlayerInteractHandler
 			player.inventory.addItemStackToInventory(jackOLanternTFC);
 		}
 	}
+
+	@SubscribeEvent
+	public void onBlockDrops(BlockEvent.HarvestDropsEvent event)
+    {
+        closeClosestPlayersScreen(event.world, event.x, event.y, event.z);
+	}
+
+    @SubscribeEvent
+    public void onBlockBreak(BlockEvent.BreakEvent event)
+    {
+        closeClosestPlayersScreen(event.world, event.x, event.y, event.z);
+    }
+
+	private void closeClosestPlayersScreen(World world, int x, int y, int z)
+    {
+        if (!world.isRemote) {
+            if (world.getTileEntity(x, y, z) instanceof NetworkTileEntity) {
+                int radius = 12;
+                List<String> playerNames = new ArrayList<String>();
+                for (int i = 0; i < 10; i++) {
+                    EntityPlayer closestPlayer = world.getClosestPlayer(x, y, z, radius);
+                    if (closestPlayer != null && !playerNames.contains(closestPlayer.getDisplayName())) {
+                        playerNames.add(closestPlayer.getDisplayName());
+                        closestPlayer.closeScreen();
+                    }
+                }
+            }
+        }
+    }
 }
