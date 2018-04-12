@@ -53,7 +53,10 @@ public class EntityDamageHandler
 		if(event.source == DamageSource.onFire)
 		{
 			//event.ammount = 50;
-			if (event.entityLiving.getHealth()-50 >= 0) event.entityLiving.setHealth(event.entityLiving.getHealth()-50); else event.entityLiving.setHealth(0);
+			if (event.entityLiving.getHealth()-50 >= 0)
+				event.entityLiving.setHealth(event.entityLiving.getHealth()-50);
+			else
+				event.entityLiving.setHealth(0);
 		}
 		else if(event.source == DamageSource.fall)
 		{
@@ -108,6 +111,10 @@ public class EntityDamageHandler
 				}
 			}
 		}
+
+		// hack to prevent "immortality" bug
+		if (event.entityLiving.getHealth() < 0)
+			event.entityLiving.setHealth(0);
 	}
 
 	protected int applyArmorCalculations(EntityLivingBase entity, DamageSource source, float originalDamage)
