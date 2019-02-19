@@ -126,11 +126,6 @@ public class PlayerInteractHandler
         closeClosestPlayersScreen(event.world, event.x, event.y, event.z);
 	}
 
-    @SubscribeEvent
-    public void onBlockBreak(BlockEvent.BreakEvent event)
-    {
-        closeClosestPlayersScreen(event.world, event.x, event.y, event.z);
-    }
 
 	private void closeClosestPlayersScreen(World world, int x, int y, int z)
     {

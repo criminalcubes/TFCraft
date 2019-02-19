@@ -18,6 +18,11 @@ public class PlayerInfo
 	public UUID playerUUID;
 	public byte chiselMode;
 	public int hoeMode;
+	public int restoreExp;
+
+	public int deathX;
+	public int deathY;
+	public int deathZ;
 
 	public int lockX = -9999999;
 	public int lockY = -9999999;

@@ -131,20 +131,31 @@ public class TFCBiome extends BiomeGenBase
 		this.spawnableCreatureList.add(new SpawnListEntry(EntityDeer.class, 1, 1, 4));
 
 		this.spawnableWaterCreatureList.clear();
-		switch(par1){
-		case 0: this.spawnableWaterCreatureList.add(new SpawnListEntry(EntitySquidTFC.class, 8, 1, 1)); break;
-		case 2: this.spawnableWaterCreatureList.add(new SpawnListEntry(EntityFishTFC.class, 7, 1, 2));
-		this.spawnableWaterCreatureList.add(new SpawnListEntry(EntityFishTFC.class, 12, 0, 0));break;
-		default: break;
+		switch(par1) {
+			case 0:
+				this.spawnableWaterCreatureList.add(new SpawnListEntry(EntitySquidTFC.class, 8, 1, 1));
+				break;
+			case 2:
+				this.spawnableWaterCreatureList.add(new SpawnListEntry(EntityFishTFC.class, 7, 1, 2));
+				this.spawnableWaterCreatureList.add(new SpawnListEntry(EntityFishTFC.class, 12, 0, 0));
+				this.spawnableWaterCreatureList.add(new SpawnListEntry(EntitySquidTFC.class, 8, 1, 1));
+			case 7:
+				this.spawnableWaterCreatureList.add(new SpawnListEntry(EntityFishTFC.class, 7, 1, 2));
+				this.spawnableWaterCreatureList.add(new SpawnListEntry(EntitySquidTFC.class, 8, 1, 1));
+				break;
+			default:
+				break;
 		}
 
 		this.spawnableMonsterList.clear();
 		this.spawnableMonsterList.add(new SpawnListEntry(EntitySpiderTFC.class, 5, 1, 1));
 		this.spawnableMonsterList.add(new SpawnListEntry(EntityZombieTFC.class, 10, 2, 4));
 		this.spawnableMonsterList.add(new SpawnListEntry(EntitySkeletonTFC.class, 8, 1, 1));
-		this.spawnableMonsterList.add(new SpawnListEntry(EntityCreeperTFC.class, 3, 1, 2));
+		//this.spawnableMonsterList.add(new SpawnListEntry(EntityCreeperTFC.class, 3, 1, 2));
+		this.spawnableMonsterList.add(new SpawnListEntry(EntityBoar.class, 3, 1, 2));
 		this.spawnableMonsterList.add(new SpawnListEntry(EntitySlimeTFC.class, 8, 1, 2));
-		this.spawnableMonsterList.add(new SpawnListEntry(EntityEndermanTFC.class, 1, 1, 2));
+		//this.spawnableMonsterList.add(new SpawnListEntry(EntityEndermanTFC.class, 1, 1, 2));
+		this.spawnableMonsterList.add(new SpawnListEntry(EntityBandit.class, 1, 1, 2));
 
 		//getBiomeGenArray()[par1] = this;
 		biomeList[par1] = this;
@@ -347,19 +358,31 @@ public class TFCBiome extends BiomeGenBase
 	 */
 	public static TFCBiome getBiome(int id)
 	{
+		TFCBiome biome = null;
 		if(biomeList[id] == null)
 		{
 			TerraFirmaCraft.LOG.warn("Biome ID is null: " + id);
 		}
 		if (id >= 0 && id <= biomeList.length && biomeList[id] != null)
 		{
-			return biomeList[id];
+			biome = biomeList[id];
 		}
 		else
 		{
 			TerraFirmaCraft.LOG.warn("Biome ID is out of bounds: " + id + ", defaulting to 0 (Ocean)");
-			return OCEAN;
+			//biome = OCEAN;
+			biome = PLAINS;
 		}
+
+		if (biome == DEEP_OCEAN) {
+			biome = PLAINS;
+		}
+
+		if (biome == OCEAN) {
+			biome = LAKE;
+		}
+
+		return biome;
 	}
 
 	public static TFCBiome getBiomeByName(String name)

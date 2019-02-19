@@ -1,22 +1,32 @@
 package com.bioxx.tfc.Handlers;
 
+import java.util.Objects;
 import java.util.Random;
 
+import com.bioxx.tfc.Core.Player.PlayerInfo;
+import com.bioxx.tfc.Core.Player.PlayerManagerTFC;
+import com.bioxx.tfc.TileEntities.TEChest;
+import com.bioxx.tfc.api.TFCBlocks;
+import com.bioxx.tfc.api.TFCItems;
+import cpw.mods.fml.common.gameevent.PlayerEvent;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.*;
 import net.minecraft.entity.boss.EntityDragonPart;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.stats.AchievementList;
 import net.minecraft.stats.StatList;
+import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityDamageSourceIndirect;
 import net.minecraft.util.MathHelper;
 
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.common.ISpecialArmor;
@@ -96,8 +106,20 @@ public class EntityDamageHandler
 		}
 		else if ("player".equals(event.source.damageType) || "mob".equals(event.source.damageType) || "arrow".equals(event.source.damageType))
 		{
-			//event.ammount = applyArmorCalculations(entity, event.source, event.ammount);
-			if (event.entityLiving.getHealth()-applyArmorCalculations(entity, event.source, event.ammount) >= 0) event.entityLiving.setHealth(event.entityLiving.getHealth()-applyArmorCalculations(entity, event.source, event.ammount)); else event.entityLiving.setHealth(0);
+			System.out.println("Arrow test 1");
+			try {
+				if ("arrow".equals(event.source.damageType)) {
+					System.out.println("Arrow test 2");
+					event.ammount = applyArmorCalculations(entity, event.source, event.ammount);
+				} else {
+					System.out.println("Arrow test 3");
+					if (event.entityLiving.getHealth()-applyArmorCalculations(entity, event.source, event.ammount) >= 0) event.entityLiving.setHealth(event.entityLiving.getHealth()-applyArmorCalculations(entity, event.source, event.ammount)); else event.entityLiving.setHealth(0);
+				}
+			} catch (Exception e) {
+				System.out.println("Error on calculating damage!");
+				e.printStackTrace();
+			}
+
 			if ("arrow".equals(event.source.damageType))
 			{
 				Entity e = ((EntityDamageSourceIndirect)event.source).getSourceOfDamage();
@@ -416,4 +438,23 @@ public class EntityDamageHandler
 		}
 		event.setCanceled(true);
 	}
+
+    @SubscribeEvent
+    public void onPlayerDeath(LivingDeathEvent event) {
+	    if (event.entityLiving instanceof EntityPlayer) {
+            EntityPlayer player = (EntityPlayer) event.entityLiving;
+
+			//player.worldObj.setBlock((int)player.posX, (int)player.posY, (int)player.posZ, TFCBlocks.chest);
+			//TEChest te = (TEChest) player.worldObj.getTileEntity((int)player.posX, (int)player.posY, (int)player.posZ);
+			//if (Math.random() <= 0.2) {
+			//	te.setInventorySlotContents(0, new ItemStack(TFCItems.bronzeJavelin));
+			//}
+
+            PlayerInfo pi = PlayerManagerTFC.getInstance().getPlayerInfoFromPlayer(player);
+            pi.restoreExp = player.experienceTotal;
+            pi.deathX = (int) player.posX;
+			pi.deathY = (int) player.posY;
+			pi.deathZ = (int) player.posZ;
+        }
+    }
 }

@@ -54,4 +54,14 @@ public class TFC_MobData
 
 	//Ghast
 	public static final int GHAST_HEALTH = 1000;
+
+	//Boar
+	public static final int BOAR_DAMAGE = 25;
+	public static final int BOAR_HEALTH = 1000;
+	public static final float BOAR_SPEED = 2.30F;
+
+	//Bandit
+	public static final int BANDIT_DAMAGE = 30;
+	public static final int BANDIT_HEALTH = 1200;
+	public static final float BANDIT_SPEED = 0.35F;
 }

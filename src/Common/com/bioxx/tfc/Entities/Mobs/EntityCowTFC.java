@@ -487,6 +487,9 @@ public class EntityCowTFC extends EntityCow implements IAnimal
 	@Override
 	public boolean isAdult()
 	{
+		//System.out.println("Birth " + getBirthDay());
+		//System.out.println("Adult " + getNumberOfDaysToAdult());
+		//System.out.println("Total " + TFC_Time.getTotalDays());
 		return getBirthDay() + getNumberOfDaysToAdult() <= TFC_Time.getTotalDays();
 	}
 

@@ -38,14 +38,14 @@ public class DataLayer
 	public static final DataLayer CHESTNUT = new DataLayer(33, "Chestnut", 3);
 	public static final DataLayer DOUGLASFIR = new DataLayer(34, "Douglas Fir", 4);
 	public static final DataLayer HICKORY = new DataLayer(35, "Hickory", 5);
-	public static final DataLayer KOA = new DataLayer(45, "Acacia Koa", 0);
+	//public static final DataLayer KOA = new DataLayer(45, "Acacia Koa", 4);
 	public static final DataLayer MAPLE = new DataLayer(36, "Maple", 6);
 	public static final DataLayer OAK = new DataLayer(37, "Oak", 0);
 	public static final DataLayer PINE = new DataLayer(38, "Pine", 8);
 	public static final DataLayer REDWOOD = new DataLayer(39, "Sequoia", 9);
 	public static final DataLayer SPRUCE = new DataLayer(40, "Spruce", 10);
 	public static final DataLayer SYCAMORE = new DataLayer(41, "Sycamore", 11);
-	public static final DataLayer SAVANNAHACACIA = new DataLayer(46, "Acacia Savannah", 0);
+	//public static final DataLayer SAVANNAHACACIA = new DataLayer(46, "Acacia Savannah", 4);
 	public static final DataLayer WHITECEDAR = new DataLayer(42, "White Cedar", 12);
 	public static final DataLayer WHITEELM = new DataLayer(43, "White Elm", 13);
 	public static final DataLayer WILLOW = new DataLayer(44, "Willow", 14);

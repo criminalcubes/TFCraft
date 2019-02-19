@@ -31,6 +31,8 @@ import com.bioxx.tfc.api.TFCFluids;
 import com.bioxx.tfc.api.TFCItems;
 import com.bioxx.tfc.api.Tools.ChiselManager;
 
+import java.awt.*;
+
 public class CommonProxy
 {
 	public void registerFluidIcons()
@@ -136,6 +138,8 @@ public class CommonProxy
 		EntityRegistry.registerGlobalEntityID(EntityPigZombieTFC.class, "pigZombieTFC", EntityRegistry.findGlobalUniqueEntityId(), 0xb6735f, 0x260026);
 		EntityRegistry.registerGlobalEntityID(EntityIronGolemTFC.class, "irongolemTFC", EntityRegistry.findGlobalUniqueEntityId(), 0xbfb99a, 0x260026);
 		EntityRegistry.registerGlobalEntityID(EntityCreeperTFC.class, "creeperTFC", EntityRegistry.findGlobalUniqueEntityId(), 0x66c55c, 0x260026);
+		EntityRegistry.registerGlobalEntityID(EntityBoar.class, "boarTFC", EntityRegistry.findGlobalUniqueEntityId(), 0x49410d, 0x777358);
+		EntityRegistry.registerGlobalEntityID(EntityBandit.class, "banditTFC", EntityRegistry.findGlobalUniqueEntityId(), 0x826322, 0xc5ab75);
 
 		EntityRegistry.registerGlobalEntityID(EntitySheepTFC.class, "sheepTFC", EntityRegistry.findGlobalUniqueEntityId(), 0xcdbfb4, 0x260026);
 		EntityRegistry.registerGlobalEntityID(EntityPheasantTFC.class, "pheasantTFC", EntityRegistry.findGlobalUniqueEntityId(), 0x822c1c, 0x260026);
@@ -175,6 +179,8 @@ public class CommonProxy
 		EntityRegistry.registerModEntity(EntityFishTFC.class, "fishTFC", 27, TerraFirmaCraft.instance, 64, 5, true);
 		EntityRegistry.registerModEntity(EntityFallingBlockTFC.class, "fallingBlock", 28, TerraFirmaCraft.instance, 160, 20, true);
 		EntityRegistry.registerModEntity(EntityBarrel.class, "barrel", 29, TerraFirmaCraft.instance, 64, 20, true);
+		EntityRegistry.registerModEntity(EntityBoar.class, "boarTFC", 30, TerraFirmaCraft.instance, 160, 5, true);
+		EntityRegistry.registerModEntity(EntityBandit.class, "banditTFC", 31, TerraFirmaCraft.instance, 160, 5, true);
 
 		/*Function<EntitySpawnMessage, Entity> spawnFunction = new Function<EntitySpawnMessage, Entity>()
 				{

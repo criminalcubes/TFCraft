@@ -1,9 +1,12 @@
 package com.bioxx.tfc.Core.Player;
 
+import cpw.mods.fml.common.gameevent.PlayerEvent;
 import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.ICrafting;
 
+import net.minecraft.util.ChatComponentTranslation;
 import net.minecraftforge.event.entity.item.ItemTossEvent;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -22,8 +25,13 @@ import com.bioxx.tfc.Handlers.Network.ConfigSyncPacket;
 import com.bioxx.tfc.Handlers.Network.InitClientWorldPacket;
 import com.bioxx.tfc.Handlers.Network.PlayerUpdatePacket;
 
+import java.util.Objects;
+import java.util.Random;
+
 public class PlayerTracker
 {
+	private Random random = new Random();
+
 	@SubscribeEvent
 	public void onPlayerLoggedIn(PlayerLoggedInEvent event)
 	{
@@ -80,9 +88,29 @@ public class PlayerTracker
 			pi.tempEquipment = null;
 		}
 
-		//Send a request to the server for the skills data.
+		// Send a request to the server for the skills data.
 		AbstractPacket pkt = new PlayerUpdatePacket(event.player, 3);
 		TerraFirmaCraft.PACKET_PIPELINE.sendTo(pkt, (EntityPlayerMP) event.player);
+
+		// Restore exp
+		double percent = 0.3;
+		EntityPlayer player = event.player;
+		if (pi.restoreExp != 0) {
+			TFC_Core.sendInfoMessage(player, new ChatComponentTranslation("exp.restore", pi.restoreExp, pi.restoreExp - (int)(pi.restoreExp * percent)));
+			//player.experienceTotal = pi.restoreExp - (int)(pi.restoreExp * percent);
+			player.addExperience(pi.restoreExp - (int)(pi.restoreExp * percent));
+			pi.restoreExp = 0;
+		}
+
+		// Send coordinates
+		if (pi.deathX != 0 && pi.deathY != 0 && pi.deathZ != 0) {
+			int messageNumber = random.nextInt(3) + 1;
+			String messageCode = "respawn.message" + messageNumber;
+			TFC_Core.sendInfoMessage(player, new ChatComponentTranslation(messageCode, pi.deathX, (int) pi.deathY, (int) pi.deathZ));
+			pi.deathX = 0;
+			pi.deathY = 0;
+			pi.deathZ = 0;
+		}
 	}
 
 	@SubscribeEvent
