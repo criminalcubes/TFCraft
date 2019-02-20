@@ -8,7 +8,9 @@ import com.bioxx.tfc.Core.Player.PlayerManagerTFC;
 import com.bioxx.tfc.TileEntities.TEChest;
 import com.bioxx.tfc.api.TFCBlocks;
 import com.bioxx.tfc.api.TFCItems;
+import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
+import jdk.nashorn.internal.runtime.regexp.joni.exception.SyntaxException;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.*;
 import net.minecraft.entity.boss.EntityDragonPart;
@@ -45,106 +47,105 @@ import com.bioxx.tfc.api.Interfaces.IInnateArmor;
 
 public class EntityDamageHandler
 {
-	@SubscribeEvent
+	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onEntityHurt(LivingHurtEvent event)
 	{
-		EntityLivingBase entity = event.entityLiving;
-		if(entity instanceof EntityPlayer)
-		{
-			float curMaxHealth = (float)((EntityPlayer)entity).getEntityAttribute(SharedMonsterAttributes.maxHealth).getAttributeValue();
-			float newMaxHealth = FoodStatsTFC.getMaxHealth((EntityPlayer)entity);
-			float h = ((EntityPlayer)entity).getHealth();
-			if(newMaxHealth != curMaxHealth)
-				((EntityPlayer)entity).getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(newMaxHealth);
-			if(newMaxHealth < h)
-				((EntityPlayer)entity).setHealth(newMaxHealth);
-		}
+		boolean tfcDamage = false;
+		String[] parts = event.source.damageType.split("\\|");
+		if (parts.length > 1 && parts[1].equals("tfc")) {
+			tfcDamage = true;
+			event.source.damageType = parts[0];
+	    }
 
-		if(event.source == DamageSource.onFire)
-		{
-			//event.ammount = 50;
-			if (event.entityLiving.getHealth()-50 >= 0)
-				event.entityLiving.setHealth(event.entityLiving.getHealth()-50);
-			else
-				event.entityLiving.setHealth(0);
-		}
-		else if(event.source == DamageSource.fall)
-		{
-			float healthMod = TFC_Core.getEntityMaxHealth(entity)/1000f;
-			//event.ammount *= 80*healthMod;
-			if (event.entityLiving.getHealth()-event.ammount*80*healthMod >= 0) event.entityLiving.setHealth(event.entityLiving.getHealth()-event.ammount*80*healthMod); else event.entityLiving.setHealth(0);
-		}
-		else if(event.source == DamageSource.drown)
-		{
-			//event.ammount = 50;
-			if (event.entityLiving.getHealth()-50 >= 0) event.entityLiving.setHealth(event.entityLiving.getHealth()-50); else event.entityLiving.setHealth(0);
-		}
-		else if(event.source == DamageSource.lava)
-		{
-			//event.ammount = 100;
-			if (event.entityLiving.getHealth()-100 >= 0) event.entityLiving.setHealth(event.entityLiving.getHealth()-100); else event.entityLiving.setHealth(0);
-		}
-		else if(event.source == DamageSource.inWall)
-		{
-			//event.ammount = 100;
-			if (event.entityLiving.getHealth()-100 >= 0) event.entityLiving.setHealth(event.entityLiving.getHealth()-100); else event.entityLiving.setHealth(0);
-		}
-		else if(event.source == DamageSource.fallingBlock)
-		{
-			//event.ammount = 100;
-			if (event.entityLiving.getHealth()-100 >= 0) event.entityLiving.setHealth(event.entityLiving.getHealth()-100); else event.entityLiving.setHealth(0);
-		}
-		else if(event.source.isExplosion())
-		{
-			//event.ammount *= 30;
-			if (event.entityLiving.getHealth()-event.ammount*30 >= 0) event.entityLiving.setHealth(event.entityLiving.getHealth()-event.ammount*30); else event.entityLiving.setHealth(0);
-		}
-		else if (event.source == DamageSource.magic && entity.getHealth() > 25)
-		{
-			//event.ammount = 25;
-			if (event.entityLiving.getHealth()-25 >= 0) event.entityLiving.setHealth(event.entityLiving.getHealth()-25); else event.entityLiving.setHealth(0);
-		}
-		else if ("player".equals(event.source.damageType) || "mob".equals(event.source.damageType) || "arrow".equals(event.source.damageType))
-		{
-			System.out.println("Arrow test 1");
-			try {
-				if ("arrow".equals(event.source.damageType)) {
-					System.out.println("Arrow test 2");
-					event.ammount = applyArmorCalculations(entity, event.source, event.ammount);
-				} else {
-					System.out.println("Arrow test 3");
-					if (event.entityLiving.getHealth()-applyArmorCalculations(entity, event.source, event.ammount) >= 0) event.entityLiving.setHealth(event.entityLiving.getHealth()-applyArmorCalculations(entity, event.source, event.ammount)); else event.entityLiving.setHealth(0);
-				}
-			} catch (Exception e) {
-				System.out.println("Error on calculating damage!");
-				e.printStackTrace();
+		if (!tfcDamage) {
+			float newDamage = event.ammount;
+			float initialDamage = event.ammount;
+
+			EntityLivingBase entity = event.entityLiving;
+
+			if(entity instanceof EntityPlayer)
+			{
+				float curMaxHealth = (float)((EntityPlayer)entity).getEntityAttribute(SharedMonsterAttributes.maxHealth).getAttributeValue();
+				float newMaxHealth = FoodStatsTFC.getMaxHealth((EntityPlayer)entity);
+				float h = ((EntityPlayer)entity).getHealth();
+				if(newMaxHealth != curMaxHealth)
+					((EntityPlayer)entity).getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(newMaxHealth);
+				if(newMaxHealth < h)
+					((EntityPlayer)entity).setHealth(newMaxHealth);
 			}
 
-			if ("arrow".equals(event.source.damageType))
+			if(event.source == DamageSource.onFire)
 			{
-				Entity e = ((EntityDamageSourceIndirect)event.source).getSourceOfDamage();
-				if(e instanceof EntityJavelin)
+				newDamage = 50;
+			}
+			if(event.source == DamageSource.inFire)
+			{
+				newDamage = 50;
+			}
+			else if(event.source == DamageSource.fall)
+			{
+				float healthMod = TFC_Core.getEntityMaxHealth(entity) / 1000f;
+				newDamage *= 80 * healthMod;
+			}
+			else if(event.source == DamageSource.drown)
+			{
+				newDamage = 50;
+			}
+			else if(event.source == DamageSource.lava)
+			{
+				newDamage = 100;
+			}
+			else if(event.source == DamageSource.inWall)
+			{
+				newDamage = 100;
+			}
+			else if(event.source == DamageSource.fallingBlock)
+			{
+				newDamage = 100;
+			}
+			else if(event.source.isExplosion())
+			{
+				newDamage *= 30;
+			}
+			else if (event.source == DamageSource.magic && entity.getHealth() > 25)
+			{
+				newDamage = 25;
+			}
+			else if ("player".equals(event.source.damageType) || "mob".equals(event.source.damageType) || "arrow".equals(event.source.damageType))
+			{
+				newDamage = applyArmorCalculations(entity, event.source, event.ammount);
+
+				if ("arrow".equals(event.source.damageType))
 				{
-					((EntityJavelin)e).setDamageTaken((short) (((EntityJavelin) e).damageTaken+10));
-					if (((EntityJavelin) e).damageTaken >= ((EntityJavelin) e).pickupItem.getMaxDamage())
+					Entity e = ((EntityDamageSourceIndirect)event.source).getSourceOfDamage();
+					if(e instanceof EntityJavelin)
 					{
-						e.setDead();
+						((EntityJavelin)e).setDamageTaken((short) (((EntityJavelin) e).damageTaken + 10));
+						if (((EntityJavelin) e).damageTaken >= ((EntityJavelin) e).pickupItem.getMaxDamage())
+						{
+							e.setDead();
+						}
 					}
 				}
 			}
-		}
 
-		// hack to prevent "immortality" bug
-		if (event.entityLiving.getHealth() < 0)
-			event.entityLiving.setHealth(0);
+			if (newDamage != initialDamage && (entity.getHealth() > newDamage + initialDamage) && !(entity.getHealth() <= 0) && !entity.isDead) {
+				DamageSource damageSource = event.source;
+				damageSource.damageType = damageSource.damageType + "|tfc";
+				entity.attackEntityFrom(damageSource, newDamage - initialDamage);
+			}
+
+		} else {
+			// do nothing
+		}
 	}
 
-	protected int applyArmorCalculations(EntityLivingBase entity, DamageSource source, float originalDamage)
+	protected float applyArmorCalculations(EntityLivingBase entity, DamageSource source, float originalDamage)
 	{
 		if(entity instanceof EntityPlayer)
         	{
             		EntityPlayer player = (EntityPlayer) entity;
-           		originalDamage = ISpecialArmor.ArmorProperties.ApplyArmor(player, player.inventory.armorInventory, source, originalDamage * 0.048F)/0.048F;
+           		originalDamage = ISpecialArmor.ArmorProperties.ApplyArmor(player, player.inventory.armorInventory, source, originalDamage * 0.048F) / 0.048F;
         	}
 		ItemStack[] armor = entity.getLastActiveItems();
 		int pierceRating = 0;
@@ -212,8 +213,17 @@ public class EntityDamageHandler
 			MinecraftForge.EVENT_BUS.post(eventPost);
 			//TerraFirmaCraft.log.info(entity.getClass()+", "+eventPre.incomingDamage+", "+eventPost.incomingDamage);
 			float hasHealth = entity.getHealth();
-			entity.setHealth(entity.getHealth()-eventPost.incomingDamage);
+
+			// ?!
+			//if (hasHealth >= eventPost.incomingDamage) {
+			//	entity.setHealth(entity.getHealth() - eventPost.incomingDamage);
+			//} else {
+			//	entity.setHealth(0);
+			//}
+
 			entity.func_110142_aN().func_94547_a(source, hasHealth, eventPost.incomingDamage);
+
+			return eventPost.incomingDamage;
 		}
 		return 0;
 	}
