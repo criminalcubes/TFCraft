@@ -5,19 +5,11 @@ import java.util.Random;
 
 import com.bioxx.tfc.Core.Player.PlayerInfo;
 import com.bioxx.tfc.Core.Player.PlayerManagerTFC;
-import com.bioxx.tfc.TileEntities.TEChest;
-import com.bioxx.tfc.api.TFCBlocks;
-import com.bioxx.tfc.api.TFCItems;
-import com.bioxx.tfc.api.TFCOptions;
-import cpw.mods.fml.common.eventhandler.Event;
 import cpw.mods.fml.common.eventhandler.EventPriority;
-import cpw.mods.fml.common.gameevent.PlayerEvent;
-import jdk.nashorn.internal.runtime.regexp.joni.exception.SyntaxException;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.*;
 import net.minecraft.entity.boss.EntityDragonPart;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -69,13 +61,13 @@ public class EntityDamageHandler
 		if (!tfcDamage) {
 
 			if (entity instanceof EntityPlayer) {
-				float curMaxHealth = (float)((EntityPlayer)entity).getEntityAttribute(SharedMonsterAttributes.maxHealth).getAttributeValue();
-				float newMaxHealth = FoodStatsTFC.getMaxHealth((EntityPlayer)entity);
-				float h = ((EntityPlayer)entity).getHealth();
+				float curMaxHealth = (float)((EntityPlayer) entity).getEntityAttribute(SharedMonsterAttributes.maxHealth).getAttributeValue();
+				float newMaxHealth = FoodStatsTFC.getMaxHealth((EntityPlayer) entity);
+				float h = ((EntityPlayer) entity).getHealth();
 				if(newMaxHealth != curMaxHealth)
-					((EntityPlayer)entity).getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(newMaxHealth);
+					((EntityPlayer) entity).getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(newMaxHealth);
 				if(newMaxHealth < h)
-					((EntityPlayer)entity).setHealth(newMaxHealth);
+					((EntityPlayer) entity).setHealth(newMaxHealth);
 
 				initialDamage = ISpecialArmor.ArmorProperties.ApplyArmor(event.entityLiving, ((EntityPlayer) event.entityLiving).inventory.armorInventory, event.source, initialDamage);
 			}
@@ -160,26 +152,6 @@ public class EntityDamageHandler
 			} else {
 				System.out.println("WARN: Damage type is not registered: " + event.source.damageType);
 			}
-
-			/*
-			if ((newDamage != initialDamage) && (entity.getHealth() > initialDamage) && (entity.getHealth() > 0) && !entity.isDead) {
-				if (newDamage > initialDamage) {
-					DamageSource damageSource = event.source;
-					damageSource.damageType = damageSource.damageType + "|tfc";
-					entity.attackEntityFrom(damageSource, newDamage - initialDamage);
-				} else {
-					float delta = initialDamage - newDamage;
-					if (entity.getHealth() + delta <= entity.getMaxHealth()) {
-						restoreAmmount = delta;
-						entity.setHealth(entity.getHealth() + restoreAmmount);
-					} else {
-						restoreAmmount = delta;
-						entity.setAbsorptionAmount(restoreAmmount);
-					}
-
-				}
-			}
-			*/
 
 			if ((newDamage != initialDamage) && (entity.getHealth() > 0) && !entity.isDead) {
 				entity.setAbsorptionAmount(initialDamage);
@@ -304,15 +276,7 @@ public class EntityDamageHandler
 			EntityArmorCalcEvent eventPost = new EntityArmorCalcEvent(entity, damage, EntityArmorCalcEvent.EventType.POST);
 			MinecraftForge.EVENT_BUS.post(eventPost);
 
-			//TerraFirmaCraft.log.info(entity.getClass()+", "+eventPre.incomingDamage+", "+eventPost.incomingDamage);
 			float hasHealth = entity.getHealth();
-
-			// ?!
-			//if (hasHealth >= eventPost.incomingDamage) {
-			//	entity.setHealth(entity.getHealth() - eventPost.incomingDamage);
-			//} else {
-			//	entity.setHealth(0);
-			//}
 
 			entity.func_110142_aN().func_94547_a(source, hasHealth, eventPost.incomingDamage);
 			return damage;
@@ -376,14 +340,16 @@ public class EntityDamageHandler
 	private int getRandomSlot(Random rand)
 	{
 		int chance = rand.nextInt(100);
-		if(chance < 10)
-			return 3;//Helm
-		else if(chance < 20)
-			return 0;//Feet
-		else if(chance < 80)
-			return 2;//Chest
-		else
-			return 1;//Legs
+
+		if (chance < 10) {
+			return 3; //Helm
+		} else if (chance < 20) {
+			return 0; //Feet
+		} else if (chance < 80) {
+			return 2; //Chest
+		} else {
+			return 1; //Legs
+		}
 	}
 
 	private float processArmorDamage(ItemStack armor, float baseDamage)
