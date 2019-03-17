@@ -2699,10 +2699,14 @@ gui.goldpan.useFlowing=This must be used under flowing water.
 gui.goldpan.overused=This area seems to be overworked. You probably wouldn't find much.
 gui.seeds.failedTemp=It's too cold to plant this, it wouldn't survive very long.
 gui.seeds.failedSun=There's not enough sunlight to plant this, it wouldn't survive very long.
+
 exp.restore=You've lost part of your experience (%d to %d)
 respawn.message1=Angel said that you died at x: %d, y: %d, z: %d
 respawn.message2=In your pocket you found a note with coordinates x: %d, y: %d, z: %d
 respawn.message3=You remember the coordinates of death x: %d, y: %d, z: %d
+hit.head=You got hit on an unprotected head, damage increased by 75%!
+hit.legs=You have been hit by unprotected feet, your movement speed has been reduced
+
 gui.forge.badChimney=There isn't enough ventilation to use this.
 gui.warning.heatstroke=You are suffering heatstroke. Drink fresh water quickly!
 gui.ProPick.Found=Found
