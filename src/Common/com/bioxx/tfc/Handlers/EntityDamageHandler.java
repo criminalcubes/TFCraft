@@ -168,7 +168,9 @@ public class EntityDamageHandler
 			if ((newDamage != initialDamage) && (entity.getHealth() > 0) && !entity.isDead) {
 
 				// prevent 2 deaths
+				boolean preventVanillaDamage = true;
 				if (newDamage >= entity.getHealth()) {
+					preventVanillaDamage = false;
 					if (initialDamage < entity.getHealth()) {
 						newDamage = entity.getHealth() - initialDamage;
 					} else {
@@ -181,7 +183,9 @@ public class EntityDamageHandler
 				DamageSource damageSource = event.source;
 				damageSource.damageType = damageSource.damageType + "|tfc";
 				entity.attackEntityFrom(damageSource, newDamage);
-				entity.setAbsorptionAmount(initialDamage);
+				if (preventVanillaDamage) {
+					entity.setAbsorptionAmount(initialDamage);
+				}
 			} else {
 
 				// debug
