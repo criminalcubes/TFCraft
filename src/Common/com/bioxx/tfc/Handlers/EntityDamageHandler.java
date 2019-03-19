@@ -3,6 +3,7 @@ package com.bioxx.tfc.Handlers;
 import java.util.Objects;
 import java.util.Random;
 
+import com.bioxx.tfc.Core.Player.FoodStatsTFC;
 import com.bioxx.tfc.Core.Player.PlayerInfo;
 import com.bioxx.tfc.Core.Player.PlayerManagerTFC;
 import cpw.mods.fml.common.eventhandler.EventPriority;
@@ -32,13 +33,13 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 import com.bioxx.tfc.Core.TFC_Core;
 import com.bioxx.tfc.Core.TFC_MobData;
-import com.bioxx.tfc.Core.Player.FoodStatsTFC;
 import com.bioxx.tfc.Entities.EntityJavelin;
 import com.bioxx.tfc.Items.ItemTFCArmor;
 import com.bioxx.tfc.api.Enums.EnumDamageType;
 import com.bioxx.tfc.api.Events.EntityArmorCalcEvent;
 import com.bioxx.tfc.api.Interfaces.ICausesDamage;
 import com.bioxx.tfc.api.Interfaces.IInnateArmor;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 
 public class EntityDamageHandler
 {
@@ -47,30 +48,34 @@ public class EntityDamageHandler
 	{
 		EntityLivingBase entity = event.entityLiving;
 
+		/*
+		if (entity instanceof EntityPlayer) {
+			float curMaxHealth = (float)((EntityPlayer) entity).getEntityAttribute(SharedMonsterAttributes.maxHealth).getAttributeValue();
+			float newMaxHealth = FoodStatsTFC.getMaxHealth((EntityPlayer) entity);
+			float h = ((EntityPlayer) entity).getHealth();
+			if(newMaxHealth != curMaxHealth)
+				((EntityPlayer) entity).getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(newMaxHealth);
+			if(newMaxHealth < h)
+				((EntityPlayer) entity).setHealth(newMaxHealth);
+
+			//initialDamage = ISpecialArmor.ArmorProperties.ApplyArmor(event.entityLiving, ((EntityPlayer) event.entityLiving).inventory.armorInventory, event.source, initialDamage);
+		}
+		*/
+
+		event.source.setDamageBypassesArmor();
+
 		boolean tfcDamage = false;
 
 		String[] parts = event.source.damageType.split("\\|");
 		if (parts.length > 1 && parts[1].equals("tfc")) {
 			tfcDamage = true;
 			event.source.damageType = parts[0];
-	    }
+		}
 
 		float newDamage = event.ammount;
 		float initialDamage = event.ammount;
 
 		if (!tfcDamage) {
-
-			if (entity instanceof EntityPlayer) {
-				float curMaxHealth = (float)((EntityPlayer) entity).getEntityAttribute(SharedMonsterAttributes.maxHealth).getAttributeValue();
-				float newMaxHealth = FoodStatsTFC.getMaxHealth((EntityPlayer) entity);
-				float h = ((EntityPlayer) entity).getHealth();
-				if(newMaxHealth != curMaxHealth)
-					((EntityPlayer) entity).getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(newMaxHealth);
-				if(newMaxHealth < h)
-					((EntityPlayer) entity).setHealth(newMaxHealth);
-
-				initialDamage = ISpecialArmor.ArmorProperties.ApplyArmor(event.entityLiving, ((EntityPlayer) event.entityLiving).inventory.armorInventory, event.source, initialDamage);
-			}
 
 			if(event.source == DamageSource.onFire)
 			{
@@ -135,6 +140,13 @@ public class EntityDamageHandler
 			}
 			else if ("player".equals(event.source.damageType) || "mob".equals(event.source.damageType) || "arrow".equals(event.source.damageType))
 			{
+				// Blocking
+				if (entity instanceof EntityPlayer) {
+					if (((EntityPlayer) entity).isBlocking()) {
+						newDamage = newDamage / 2;
+					}
+				}
+
 				newDamage = applyArmorCalculations(entity, event.source, newDamage);
 
 				if ("arrow".equals(event.source.damageType))
@@ -154,12 +166,37 @@ public class EntityDamageHandler
 			}
 
 			if ((newDamage != initialDamage) && (entity.getHealth() > 0) && !entity.isDead) {
-				entity.setAbsorptionAmount(initialDamage);
+
+				// prevent 2 deaths
+				if (newDamage >= entity.getHealth()) {
+					if (initialDamage < entity.getHealth()) {
+						newDamage = entity.getHealth() - initialDamage;
+					} else {
+						newDamage = 0;
+					}
+				}
+
 				entity.hurtResistantTime = 0;
 
 				DamageSource damageSource = event.source;
 				damageSource.damageType = damageSource.damageType + "|tfc";
 				entity.attackEntityFrom(damageSource, newDamage);
+				entity.setAbsorptionAmount(initialDamage);
+			} else {
+
+				// debug
+				if (entity instanceof EntityPlayer) {
+					if (TFC_Core.isPlayerInDebugMode((EntityPlayer) entity)) {
+						TFC_Core.sendInfoMessage(
+								(EntityPlayer) entity,
+								new ChatComponentTranslation(
+										"Source: %s, damage: %s (vanilla)",
+										event.source.damageType + (Objects.nonNull(event.source.getEntity()) ? " (" + event.source.getEntity().getCommandSenderName() + ")" : ""),
+										initialDamage
+								)
+						);
+					}
+				}
 			}
 
 		} else {
@@ -171,7 +208,7 @@ public class EntityDamageHandler
 					TFC_Core.sendInfoMessage(
 							(EntityPlayer) entity,
 							new ChatComponentTranslation(
-									"Source: %s, damage: %s",
+									"Source: %s, damage: %s (tfc)",
 									event.source.damageType + (Objects.nonNull(event.source.getEntity()) ? " (" + event.source.getEntity().getCommandSenderName() + ")" : ""),
 									initialDamage
 							)
@@ -179,15 +216,32 @@ public class EntityDamageHandler
 				}
 			}
 		}
+
+
+		/*
+		ItemStack[] armor = entity.getLastActiveItems();
+		if (Objects.nonNull(armor) && armor.length > 0) {
+			for (ItemStack armorPart : armor) {
+				if (Objects.nonNull(armorPart)) {
+					//armorPart.setItemDamage(0);
+					armorPart.
+					armorPart.setItemDamage(armorPart.getItemDamage() - ((int) initialDamage) + 1);
+				}
+			}
+		}
+		*/
 	}
+
 
 	protected float applyArmorCalculations(EntityLivingBase entity, DamageSource source, float originalDamage)
 	{
+		/*
 		if(entity instanceof EntityPlayer)
         	{
             		EntityPlayer player = (EntityPlayer) entity;
            		originalDamage = ISpecialArmor.ArmorProperties.ApplyArmor(player, player.inventory.armorInventory, source, originalDamage * 0.048F) / 0.048F;
         	}
+        */
 		ItemStack[] armor = entity.getLastActiveItems();
 		int pierceRating = 0;
 		int slashRating = 0;
@@ -197,7 +251,8 @@ public class EntityDamageHandler
 		MinecraftForge.EVENT_BUS.post(eventPre);
 		float damage = eventPre.incomingDamage;
 
-		if (!source.isUnblockable() && armor != null)
+		//if (!source.isUnblockable() && armor != null)
+		if (armor != null)
 		{
 			//1. Get Random Hit Location
 			int location = getRandomSlot(entity.getRNG());
@@ -224,9 +279,6 @@ public class EntityDamageHandler
 				damage = processDamageSource(source, damage, pierceMult,
 						slashMult, crushMult);
 
-				//5. Damage the armor that was hit
-				armor[location].damageItem((int) processArmorDamage(armor[location], damage), entity);
-
 				// debug
 				if (entity instanceof EntityPlayer) {
 					if (TFC_Core.isPlayerInDebugMode((EntityPlayer) entity)) {
@@ -235,11 +287,23 @@ public class EntityDamageHandler
 								new ChatComponentTranslation(
 										"Damage armor: %s, %s",
 										armor[location].getDisplayName(),
-										damage
+										(int) processArmorDamage(armor[location], damage)
+								)
+						);
+						TFC_Core.sendInfoMessage(
+								(EntityPlayer) entity,
+								new ChatComponentTranslation(
+										"pierceMult: %s, slashMult: %s, crushMult: %s",
+										pierceMult,
+										slashMult,
+										crushMult
 								)
 						);
 					}
 				}
+
+				//5. Damage the armor that was hit
+				armor[location].damageItem((int) processArmorDamage(armor[location], damage), entity);
 			}
 			else if (armor[location] == null || armor[location] != null && !(armor[location].getItem() instanceof ItemTFCArmor))
 			{
@@ -279,13 +343,14 @@ public class EntityDamageHandler
 			float hasHealth = entity.getHealth();
 
 			entity.func_110142_aN().func_94547_a(source, hasHealth, eventPost.incomingDamage);
+
 			return damage;
 		}
 		return 0;
 	}
 
 	private float processDamageSource(DamageSource source, float damage,
-			float pierceMult, float slashMult, float crushMult)
+									  float pierceMult, float slashMult, float crushMult)
 	{
 		EnumDamageType damageType = getDamageType(source);
 		//4.2 Reduce the damage based upon the incoming Damage Type
@@ -308,7 +373,7 @@ public class EntityDamageHandler
 		return Math.max(0, damage);
 	}
 
-	private EnumDamageType getDamageType(DamageSource source) 
+	private EnumDamageType getDamageType(DamageSource source)
 	{
 		//4.1 Determine the source of the damage and get the appropriate Damage Type
 		if(source.getSourceOfDamage() instanceof EntityPlayer)
@@ -426,9 +491,9 @@ public class EntityDamageHandler
 
 				if (damageAmount > 0 || enchantmentDamage > 0)
 				{
-					boolean criticalHit = player.fallDistance > 0.0F && !player.onGround && 
-							!player.isOnLadder() && !player.isInWater() && 
-							!player.isPotionActive(Potion.blindness) && player.ridingEntity == null && 
+					boolean criticalHit = player.fallDistance > 0.0F && !player.onGround &&
+							!player.isOnLadder() && !player.isInWater() &&
+							!player.isPotionActive(Potion.blindness) && player.ridingEntity == null &&
 							target instanceof EntityLiving;
 
 					if (criticalHit && damageAmount > 0)
@@ -452,7 +517,7 @@ public class EntityDamageHandler
 						target.attackEntityFrom(DamageSource.causePlayerDamage(player), damageAmount);
 						if (knockback > 0)
 						{
-							target.addVelocity(-MathHelper.sin(player.rotationYaw * (float)Math.PI / 180.0F) * knockback * 0.5F, 0.1D, 
+							target.addVelocity(-MathHelper.sin(player.rotationYaw * (float)Math.PI / 180.0F) * knockback * 0.5F, 0.1D,
 									MathHelper.cos(player.rotationYaw * (float)Math.PI / 180.0F) * knockback * 0.5F);
 							player.motionX *= 0.6D;
 							player.motionZ *= 0.6D;
@@ -486,9 +551,10 @@ public class EntityDamageHandler
 
 					if (itemstack != null && object instanceof EntityLiving)
 					{
-						itemstack.hitEntity((EntityLiving)object, player);
-						if (itemstack.stackSize <= 0)
+						itemstack.hitEntity((EntityLiving) object, player);
+						if (itemstack.stackSize <= 0) {
 							player.destroyCurrentEquippedItem();
+						}
 					}
 
 					if (target instanceof EntityLivingBase)
@@ -507,10 +573,10 @@ public class EntityDamageHandler
 		event.setCanceled(true);
 	}
 
-    @SubscribeEvent
-    public void onPlayerDeath(LivingDeathEvent event) {
-	    if (event.entityLiving instanceof EntityPlayer) {
-            EntityPlayer player = (EntityPlayer) event.entityLiving;
+	@SubscribeEvent
+	public void onPlayerDeath(LivingDeathEvent event) {
+		if (event.entityLiving instanceof EntityPlayer) {
+			EntityPlayer player = (EntityPlayer) event.entityLiving;
 
 			//player.worldObj.setBlock((int)player.posX, (int)player.posY, (int)player.posZ, TFCBlocks.chest);
 			//TEChest te = (TEChest) player.worldObj.getTileEntity((int)player.posX, (int)player.posY, (int)player.posZ);
@@ -518,11 +584,11 @@ public class EntityDamageHandler
 			//	te.setInventorySlotContents(0, new ItemStack(TFCItems.bronzeJavelin));
 			//}
 
-            PlayerInfo pi = PlayerManagerTFC.getInstance().getPlayerInfoFromPlayer(player);
-            pi.restoreExp = player.experienceTotal;
-            pi.deathX = (int) player.posX;
+			PlayerInfo pi = PlayerManagerTFC.getInstance().getPlayerInfoFromPlayer(player);
+			pi.restoreExp = player.experienceTotal;
+			pi.deathX = (int) player.posX;
 			pi.deathY = (int) player.posY;
 			pi.deathZ = (int) player.posZ;
-        }
-    }
+		}
+	}
 }

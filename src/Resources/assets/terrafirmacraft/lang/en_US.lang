@@ -2704,6 +2704,7 @@ exp.restore=You've lost part of your experience (%d to %d)
 respawn.message1=Angel said that you died at x: %d, y: %d, z: %d
 respawn.message2=In your pocket you found a note with coordinates x: %d, y: %d, z: %d
 respawn.message3=You remember the coordinates of death x: %d, y: %d, z: %d
+
 hit.head=You got hit on an unprotected head, damage increased by 75%!
 hit.legs=You have been hit by unprotected feet, your movement speed has been reduced
 
