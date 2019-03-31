@@ -100,11 +100,19 @@ public class EntityDamageHandler
 			}
 			else if (event.source == DamageSource.inWall)
 			{
-				newDamage = 100;
+				if (entity instanceof EntityPlayer) {
+					newDamage = 50;
+				} else {
+					newDamage = 5;
+				}
 			}
 			else if (event.source == DamageSource.fallingBlock)
 			{
-				newDamage = 100;
+				if (entity instanceof EntityPlayer) {
+					newDamage = 50;
+				} else {
+					newDamage = 5;
+				}
 			}
 			else if (event.source == DamageSource.outOfWorld)
 			{
