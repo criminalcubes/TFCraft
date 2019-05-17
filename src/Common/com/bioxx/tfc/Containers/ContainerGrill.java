@@ -12,6 +12,8 @@ import com.bioxx.tfc.Core.Player.PlayerInventory;
 import com.bioxx.tfc.TileEntities.TEGrill;
 import com.bioxx.tfc.api.TileEntities.TEFireEntity;
 
+import java.util.Objects;
+
 public class ContainerGrill extends ContainerTFC
 {
 	//private TEGrill grill;
@@ -42,7 +44,7 @@ public class ContainerGrill extends ContainerTFC
 	@Override
 	public boolean canInteractWith(EntityPlayer entityplayer)
 	{
-		return fire.isUseableByPlayer(entityplayer);
+		return Objects.nonNull(fire) ? fire.isUseableByPlayer(entityplayer) : false;
 	}
 
 	@Override

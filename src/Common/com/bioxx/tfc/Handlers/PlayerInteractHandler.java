@@ -3,6 +3,7 @@ package com.bioxx.tfc.Handlers;
 import java.util.*;
 
 import com.bioxx.tfc.TileEntities.NetworkTileEntity;
+import cpw.mods.fml.common.eventhandler.EventPriority;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -26,6 +27,7 @@ import com.bioxx.tfc.Core.Player.FoodStatsTFC;
 import com.bioxx.tfc.api.TFCBlocks;
 import com.bioxx.tfc.api.TFCItems;
 import com.bioxx.tfc.api.Util.Helper;
+import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.event.world.BlockEvent;
 
 public class PlayerInteractHandler

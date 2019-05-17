@@ -1,5 +1,6 @@
 package com.bioxx.tfc.Handlers;
 
+import java.util.Date;
 import java.util.Objects;
 import java.util.Random;
 
@@ -7,10 +8,12 @@ import com.bioxx.tfc.Core.Player.FoodStatsTFC;
 import com.bioxx.tfc.Core.Player.PlayerInfo;
 import com.bioxx.tfc.Core.Player.PlayerManagerTFC;
 import cpw.mods.fml.common.eventhandler.EventPriority;
+import net.minecraft.client.Minecraft;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.*;
 import net.minecraft.entity.boss.EntityDragonPart;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerCapabilities;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -116,15 +119,19 @@ public class EntityDamageHandler
 			}
 			else if (event.source == DamageSource.outOfWorld)
 			{
+				System.out.println("OUT OF WORLD ENTITY " + entity.getCommandSenderName() + " COORDS: " + entity.posX + " " + entity.posY + " " + entity.posZ);
 				if (entity instanceof EntityPlayer) {
-					// do nothing
+					// Prevent bed > y=127 bug
+					if (entity.posY > 0) {
+						entity.setAbsorptionAmount(event.ammount);
+					}
 				} else {
+					// Prevent CustomNPCs falling
+					if (entity.getClass().getName().toLowerCase().contains("custom")) {
+						entity.setPositionAndUpdate(entity.posX, 255, entity.posZ);
+					}
 					newDamage = 100;
 				}
-			}
-			else if ("thrown".equals(event.source.damageType))
-			{
-				// do nothing
 			}
 			else if ("thorns".equals(event.source.damageType))
 			{
@@ -146,7 +153,7 @@ public class EntityDamageHandler
 			{
 				newDamage = 25;
 			}
-			else if ("player".equals(event.source.damageType) || "mob".equals(event.source.damageType) || "arrow".equals(event.source.damageType))
+			else if ("player".equals(event.source.damageType) || "mob".equals(event.source.damageType) || "arrow".equals(event.source.damageType) || "thrown".equals(event.source.damageType))
 			{
 				// Blocking
 				if (entity instanceof EntityPlayer) {
@@ -157,7 +164,7 @@ public class EntityDamageHandler
 
 				newDamage = applyArmorCalculations(entity, event.source, newDamage);
 
-				if ("arrow".equals(event.source.damageType))
+				if ("arrow".equals(event.source.damageType) || "thrown".equals(event.source.damageType))
 				{
 					Entity e = ((EntityDamageSourceIndirect) event.source).getSourceOfDamage();
 					if (e instanceof EntityJavelin) {
