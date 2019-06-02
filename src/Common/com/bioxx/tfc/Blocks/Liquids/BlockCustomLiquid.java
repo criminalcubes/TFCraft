@@ -299,8 +299,10 @@ public abstract class BlockCustomLiquid extends BlockDynamicLiquid implements IF
 	public boolean canStay(World world, int x, int y, int z)
 	{
 		Block block = world.getBlock(x, y, z);
-		if(block == TFCBlocks.thatch || block == TFCBlocks.barrel || block == TFCBlocks.vessel || block == TFCBlocks.berryBush || 
-				block == TFCBlocks.smokeRack || block instanceof BlockCustomDoor || block == TFCBlocks.ingotPile)
+		if (block == TFCBlocks.thatch || block == TFCBlocks.vessel || block == TFCBlocks.berryBush ||
+				block == TFCBlocks.smokeRack  || block == TFCBlocks.ingotPile
+				//|| block instanceof BlockCustomDoor  || block == TFCBlocks.barrel
+			)
 			return false;
 		else
 			return super.func_149807_p(world, x, y, z);

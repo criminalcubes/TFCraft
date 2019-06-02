@@ -114,7 +114,7 @@ public class ItemJavelin extends ItemTerraTool implements ICausesDamage, IProjec
 	@Override
 	public void onPlayerStoppedUsing(ItemStack itemstack, World world, EntityPlayer player, int itemInUseCount)
 	{
-		if(!world.isRemote)
+		if (!world.isRemote)
 		{
 			int var6 = this.getMaxItemUseDuration(itemstack) - itemInUseCount;
 			float force = Math.min(var6/20.0f, 1.0f);
@@ -147,9 +147,13 @@ public class ItemJavelin extends ItemTerraTool implements ICausesDamage, IProjec
 			javelin.setDamageTaken((short) itemstack.getItemDamage());
 			javelin.setPickupItem(itemstack.getItem());
 
-			player.inventory.mainInventory[player.inventory.currentItem] = null;
+			if (player.inventory.mainInventory[player.inventory.currentItem] == itemstack) {
+				player.inventory.mainInventory[player.inventory.currentItem] = null;
+			} else {
+				removeItemStackFromInventory(itemstack, player.inventory.mainInventory);
+			}
 
-			if(!consumeJavelin(player))
+			if (!consumeJavelin(player))
 			{
 				player.inventory.mainInventory[player.inventory.currentItem] = consumeJavelinInQuiver(player, true);
 			}
@@ -157,6 +161,15 @@ public class ItemJavelin extends ItemTerraTool implements ICausesDamage, IProjec
 			if (!world.isRemote)
 			{
 				world.spawnEntityInWorld(javelin);
+			}
+		}
+	}
+
+	private void removeItemStackFromInventory(ItemStack itemStack, ItemStack[] inventory) {
+		for (int i = 0; i < inventory.length; i++) {
+			if (inventory[i] == itemStack) {
+				inventory[i] = null;
+				return;
 			}
 		}
 	}
@@ -177,7 +190,7 @@ public class ItemJavelin extends ItemTerraTool implements ICausesDamage, IProjec
 	public ItemStack consumeJavelinInQuiver(EntityPlayer player, boolean shouldConsume)
 	{
 		ItemStack quiver = player.inventory.getStackInSlot(36);
-		if(quiver != null && quiver.getItem() instanceof ItemQuiver)
+		if (quiver != null && quiver.getItem() instanceof ItemQuiver)
 			return ((ItemQuiver)quiver.getItem()).consumeAmmo(quiver, EnumAmmo.JAVELIN, shouldConsume);
 		return null;
 	}
@@ -187,9 +200,14 @@ public class ItemJavelin extends ItemTerraTool implements ICausesDamage, IProjec
 		int active = player.inventory.currentItem;
 		int nextJav = getInventorySlotContainJavelin(player);
 
+		// player changed active slot after throw
+		if (player.inventory.mainInventory[active] != null)
+		{
+			return true;
+		}
+
 		if (nextJav < 0)
 		{
-			player.inventory.mainInventory[active] = null;
 			return false;
 		}
 		else

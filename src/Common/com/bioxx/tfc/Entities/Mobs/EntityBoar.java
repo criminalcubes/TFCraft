@@ -99,7 +99,7 @@ public class EntityBoar extends EntityMob implements ICausesDamage {
 
     @Override
     protected Item getDropItem() {
-        return this.isBurning() ? Items.cooked_porkchop : Items.porkchop;
+        return null;
     }
 
     @Override

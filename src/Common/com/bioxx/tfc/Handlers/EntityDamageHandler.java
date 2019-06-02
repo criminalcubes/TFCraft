@@ -104,7 +104,7 @@ public class EntityDamageHandler
 			else if (event.source == DamageSource.inWall)
 			{
 				if (entity instanceof EntityPlayer) {
-					newDamage = 50;
+					//newDamage = 50;
 				} else {
 					newDamage = 5;
 				}

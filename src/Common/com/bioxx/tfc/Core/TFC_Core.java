@@ -1,11 +1,9 @@
 package com.bioxx.tfc.Core;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
+import com.mojang.authlib.GameProfile;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockGlass;
 import net.minecraft.block.BlockStainedGlass;
@@ -17,6 +15,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
@@ -27,9 +26,13 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.*;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.storage.WorldInfo;
 
+import net.minecraftforge.common.util.BlockSnapshot;
+import net.minecraftforge.common.util.FakePlayer;
+import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -37,6 +40,8 @@ import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
+import net.minecraftforge.event.ForgeEventFactory;
+import net.minecraftforge.event.world.BlockEvent;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
@@ -1341,15 +1346,35 @@ public class TFC_Core
 
 	public static boolean setBlockWithDrops(World world, int x, int y, int z, Block b, int meta)
 	{
-		Block block = world.getBlock(x, y, z);
-
-		if (block.getMaterial() != Material.air)
-		{
-			int l = world.getBlockMetadata(x, y, z);
-			world.playAuxSFX(2001, x, y, z, Block.getIdFromBlock(block) + (l << 12));
-			block.dropBlockAsItem(world, x, y, z, l, 0);
+		// TODO: Refactor
+		// -- Towny check --
+		int radius = 5;
+		EntityPlayerMP player = (EntityPlayerMP) world.getClosestPlayer(x, y, z, radius);
+		if (player == null) {
+			GameProfile gameProfile = new GameProfile(UUID.fromString("3186ad73-5b4b-4feb-9628-41f376264ef0"), "TerraFirmaCraft");
+			player = FakePlayerFactory.get((WorldServer) world, gameProfile);
 		}
-		return world.setBlock(x, y, z, b, meta, 3);
+		BlockSnapshot blockSnapshot = new BlockSnapshot(world, x, y, z, Blocks.dirt, 0);
+		BlockEvent.PlaceEvent event = ForgeEventFactory.onPlayerBlockPlace(player, blockSnapshot, ForgeDirection.UNKNOWN);
+		if (!event.isCanceled())
+		{
+			event.setCanceled(true);
+
+			// -- Method Body --
+			Block block = world.getBlock(x, y, z);
+
+			if (block.getMaterial() != Material.air)
+			{
+				int l = world.getBlockMetadata(x, y, z);
+				world.playAuxSFX(2001, x, y, z, Block.getIdFromBlock(block) + (l << 12));
+				block.dropBlockAsItem(world, x, y, z, l, 0);
+			}
+			return world.setBlock(x, y, z, b, meta, 3);
+			// -- End Method Body --
+		}
+		// -- End Towny check --
+
+		return false;
 	}
 
 	/**
