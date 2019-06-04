@@ -1,6 +1,6 @@
 package com.bioxx.tfc.Core.Player;
 
-import cpw.mods.fml.common.gameevent.PlayerEvent;
+import cpw.mods.fml.common.eventhandler.EventPriority;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -10,12 +10,12 @@ import net.minecraft.util.ChatComponentTranslation;
 import net.minecraftforge.event.entity.item.ItemTossEvent;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent.ItemPickupEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent.PlayerRespawnEvent;
 import cpw.mods.fml.common.network.FMLNetworkEvent.ClientConnectedToServerEvent;
 import cpw.mods.fml.common.network.FMLNetworkEvent.ServerDisconnectionFromClientEvent;
-import cpw.mods.fml.common.gameevent.PlayerEvent.PlayerChangedDimensionEvent;
 
 import com.bioxx.tfc.TerraFirmaCraft;
 import com.bioxx.tfc.Core.TFC_Core;
@@ -25,7 +25,6 @@ import com.bioxx.tfc.Handlers.Network.ConfigSyncPacket;
 import com.bioxx.tfc.Handlers.Network.InitClientWorldPacket;
 import com.bioxx.tfc.Handlers.Network.PlayerUpdatePacket;
 
-import java.util.Objects;
 import java.util.Random;
 
 public class PlayerTracker
@@ -144,6 +143,8 @@ public class PlayerTracker
 
 	@SubscribeEvent
 	public void onPlayerChangedDimension(cpw.mods.fml.common.gameevent.PlayerEvent.PlayerChangedDimensionEvent event)  {
+
+		// ???
 		try
 		{
 			event.player.inventoryContainer.addCraftingToCrafters((ICrafting)event.player);
@@ -151,6 +152,18 @@ public class PlayerTracker
 		catch (IllegalArgumentException exception)
 		{
 			//LogHelper.error(ReferenceTAPI.MOD_NAME, "Inventory has already be resync'd");
+		}
+
+		AbstractPacket pkt = new InitClientWorldPacket(event.player);
+		TerraFirmaCraft.PACKET_PIPELINE.sendTo(pkt, (EntityPlayerMP) event.player);
+	}
+
+	@SubscribeEvent(priority = EventPriority.HIGHEST)
+	public void onPlayerTick(TickEvent.PlayerTickEvent event) {
+		if (event.player.isPlayerSleeping()) {
+			if (event.player.posY < 0) {
+				event.player.setPositionAndUpdate(event.player.posX, event.player.posY + 256, event.player.posZ);
+			}
 		}
 	}
 }
