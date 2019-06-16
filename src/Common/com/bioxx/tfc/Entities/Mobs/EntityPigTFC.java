@@ -574,7 +574,11 @@ public class EntityPigTFC extends EntityPig implements IAnimal
 		 * This Cancels out the changes made to growingAge by EntityAgeable
 		 * */
 		TFC_Core.preventEntityDataUpdate = true;
-		super.onLivingUpdate();
+		try {
+			super.onLivingUpdate();
+		} catch (Exception e) {
+			System.out.println("Error on living update pig: " + e.getMessage());
+		}
 		TFC_Core.preventEntityDataUpdate = false;
 
 		if (hunger > 144000 && rand.nextInt (100) == 0 && getHealth() < TFC_Core.getEntityMaxHealth(this) && !isDead){

@@ -134,36 +134,38 @@ public class TEForge extends TEFireEntity implements IInventory
 					if (inputCopy.getItem() instanceof ISmeltable)
 					{
 						ISmeltable smelt = (ISmeltable)inputCopy.getItem();
-						ItemStack meltedItem = new ItemStack(smelt.getMetalType(inputCopy).meltedItem);
-						TFC_ItemHeat.setTemp(meltedItem, temperature);
+						if (smelt != null && smelt.getMetalType(inputCopy) != null) {
+							ItemStack meltedItem = new ItemStack(smelt.getMetalType(inputCopy).meltedItem);
+							TFC_ItemHeat.setTemp(meltedItem, temperature);
 
-						int units = smelt.getMetalReturnAmount(inputCopy);
-						// Raw/Refined Blooms give at max 100 units to force players to split using the anvil
-						if (inputCopy.getItem() instanceof ItemBloom)
-							units = Math.min(100, units);
+							int units = smelt.getMetalReturnAmount(inputCopy);
+							// Raw/Refined Blooms give at max 100 units to force players to split using the anvil
+							if (inputCopy.getItem() instanceof ItemBloom)
+								units = Math.min(100, units);
 
-						while(units > 0 && getMold() != null)
-						{
-							ItemStack moldIS = this.getMold();
-							ItemStack outputCopy = meltedItem.copy();
-
-							if (units > 100)
+							while(units > 0 && getMold() != null)
 							{
-								units-= 100;
-								moldIS.stackSize--;
-								if(!addToStorage(outputCopy.copy()))
+								ItemStack moldIS = this.getMold();
+								ItemStack outputCopy = meltedItem.copy();
+
+								if (units > 100)
 								{
-									EntityItem ei = new EntityItem(worldObj, xCoord + 0.5, yCoord + 1.5, zCoord + 0.5, outputCopy);
-									ei.motionX = 0; ei.motionY = 0; ei.motionZ = 0;
-									worldObj.spawnEntityInWorld(ei);
+									units-= 100;
+									moldIS.stackSize--;
+									if(!addToStorage(outputCopy.copy()))
+									{
+										EntityItem ei = new EntityItem(worldObj, xCoord + 0.5, yCoord + 1.5, zCoord + 0.5, outputCopy);
+										ei.motionX = 0; ei.motionY = 0; ei.motionZ = 0;
+										worldObj.spawnEntityInWorld(ei);
+									}
 								}
-							}
-							else if (units > 0) // Put the last item in the forge cooking slot, replacing the input.
-							{
-								outputCopy.setItemDamage(100-units);
-								units = 0;
-								moldIS.stackSize--;
-								fireItemStacks[i] = outputCopy.copy();
+								else if (units > 0) // Put the last item in the forge cooking slot, replacing the input.
+								{
+									outputCopy.setItemDamage(100-units);
+									units = 0;
+									moldIS.stackSize--;
+									fireItemStacks[i] = outputCopy.copy();
+								}
 							}
 						}
 					}
