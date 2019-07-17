@@ -608,6 +608,12 @@ public class EntityDamageHandler
 			pi.deathX = (int) player.posX;
 			pi.deathY = (int) player.posY;
 			pi.deathZ = (int) player.posZ;
+
+			if (player.getEntityData().hasKey("craftingTable")) {
+				pi.hasWorkbench = true;
+			} else {
+				pi.hasWorkbench = false;
+			}
 		}
 	}
 }

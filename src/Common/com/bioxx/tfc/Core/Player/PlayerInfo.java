@@ -19,6 +19,7 @@ public class PlayerInfo
 	public byte chiselMode;
 	public int hoeMode;
 	public int restoreExp;
+	public boolean hasWorkbench;
 
 	public int deathX;
 	public int deathY;

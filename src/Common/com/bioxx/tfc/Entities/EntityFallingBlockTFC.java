@@ -228,7 +228,7 @@ public class EntityFallingBlockTFC extends Entity implements IEntityAdditionalSp
 	{
 		Block b = world.getBlock(x, y, z);
 		if (canDestroy(b) && (b.isAir(world, x, y, z) || 
-				!b.isOpaqueCube() && !b.renderAsNormalBlock() && !worldObj.isSideSolid(x, y, z, ForgeDirection.UP)))
+				!b.isOpaqueCube() && !b.renderAsNormalBlock() && !worldObj.isSideSolid(x, y, z, ForgeDirection.UP)) && b.getBlockHardness(worldObj, x, y, z) >= 0)
 			return TFC_Core.setBlockWithDrops(worldObj, x, y, z, getBlock(), this.blockMeta);
 		else if (b instanceof BlockOre && TFCOptions.enableCaveInsDestroyOre)
 			return world.setBlockToAir(x, y, z);

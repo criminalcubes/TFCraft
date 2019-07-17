@@ -101,6 +101,11 @@ public class PlayerTracker
 			pi.restoreExp = 0;
 		}
 
+		// Restore workbench
+		if (pi.hasWorkbench) {
+			player.getEntityData().setBoolean("craftingTable", true);
+		}
+
 		// Send coordinates
 		if (pi.deathX != 0 && pi.deathY != 0 && pi.deathZ != 0) {
 			int messageNumber = random.nextInt(3) + 1;
