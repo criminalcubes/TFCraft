@@ -104,6 +104,7 @@ public class PlayerTracker
 		// Restore workbench
 		if (pi.hasWorkbench) {
 			player.getEntityData().setBoolean("craftingTable", true);
+			PlayerInventory.upgradePlayerCrafting(player);
 		}
 
 		// Send coordinates
