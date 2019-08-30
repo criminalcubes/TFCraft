@@ -11,7 +11,9 @@ import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
@@ -232,6 +234,15 @@ public class EntityFallingBlockTFC extends Entity implements IEntityAdditionalSp
 			return TFC_Core.setBlockWithDrops(worldObj, x, y, z, getBlock(), this.blockMeta);
 		else if (b instanceof BlockOre && TFCOptions.enableCaveInsDestroyOre)
 			return world.setBlockToAir(x, y, z);
+		else if (b.getBlockHardness(worldObj, x, y, z) < 0) {
+			EntityItem blockItem = new EntityItem(world, this.posX, this.posY + 0.5, this.posZ, new ItemStack(Item.getItemFromBlock(getBlock())));
+			blockItem.motionX = 0;
+			blockItem.motionY = 0;
+			blockItem.motionZ = 0;
+			blockItem.delayBeforeCanPickup = 0;
+			world.spawnEntityInWorld(blockItem);
+			this.setDead();
+		}
 		return false;
 	}
 

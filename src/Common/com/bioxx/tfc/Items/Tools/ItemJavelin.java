@@ -114,8 +114,15 @@ public class ItemJavelin extends ItemTerraTool implements ICausesDamage, IProjec
 	@Override
 	public void onPlayerStoppedUsing(ItemStack itemstack, World world, EntityPlayer player, int itemInUseCount)
 	{
-		if (!world.isRemote)
+		if (!world.isRemote && player.inventory.mainInventory[player.inventory.currentItem] == itemstack)
 		{
+			removeItemStackFromInventory(itemstack, player.inventory.mainInventory);
+
+			if (!consumeJavelin(player))
+			{
+				player.inventory.mainInventory[player.inventory.currentItem] = consumeJavelinInQuiver(player, true);
+			}
+
 			int var6 = this.getMaxItemUseDuration(itemstack) - itemInUseCount;
 			float force = Math.min(var6/20.0f, 1.0f);
 
@@ -146,17 +153,6 @@ public class ItemJavelin extends ItemTerraTool implements ICausesDamage, IProjec
 			world.playSoundAtEntity(player, "random.bow", 1.0F, 0.3F);
 			javelin.setDamageTaken((short) itemstack.getItemDamage());
 			javelin.setPickupItem(itemstack.getItem());
-
-			if (player.inventory.mainInventory[player.inventory.currentItem] == itemstack) {
-				player.inventory.mainInventory[player.inventory.currentItem] = null;
-			} else {
-				removeItemStackFromInventory(itemstack, player.inventory.mainInventory);
-			}
-
-			if (!consumeJavelin(player))
-			{
-				player.inventory.mainInventory[player.inventory.currentItem] = consumeJavelinInQuiver(player, true);
-			}
 
 			if (!world.isRemote)
 			{

@@ -46,6 +46,7 @@ public class TFCOptions
 	 * Made into a float because the config readout will round it to a float anyways.
 	 */
 	public static float foodDecayRate = 1.0170378966055869517978300569768f;
+	public static float foodDecayRateInOtherContainers = 10;
 	public static boolean useDecayProtection = true;
 	public static int decayProtectionDays = 24;
 	public static float decayMultiplier = 1.0f;

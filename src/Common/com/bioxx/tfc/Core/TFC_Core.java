@@ -18,6 +18,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -1029,7 +1030,7 @@ public class TFC_Core
 				else if (is.getItem() instanceof ItemTerraBlock && ((ItemTerraBlock) is.getItem()).onUpdate(is, world, x, y, z))
 					continue;
 				is = tickDecay(is, world, x, y, z, environmentalDecayFactor, 1f);
-				if(is != null)
+				if (is != null)
 					TFC_ItemHeat.handleItemHeat(is);
 				iinv.setInventorySlotContents(i, is);
 			}
@@ -1255,6 +1256,7 @@ public class TFC_Core
 
 	public static boolean isValidCharcoalPitCover(Block block)
 	{
+		if(block.getMaterial() == Material.iron) return true;
 		if(Blocks.fire.getFlammability(block) > 0 && block != TFCBlocks.logPile) return false;
 
 		return block == TFCBlocks.logPile

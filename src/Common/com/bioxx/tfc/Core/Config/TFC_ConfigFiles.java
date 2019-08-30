@@ -391,6 +391,7 @@ public class TFC_ConfigFiles
 		useDecayProtection = generalConfig.getBoolean("useDecayProtection", FOOD_DECAY, useDecayProtection, "Set this to false if you want food to auto decay when a chunk is loaded instead of limiting decay when a chunk has been unloaded for a long period.", "config.gui.TFCConfig.fooddecay.useDecayProtection");
 		decayProtectionDays = generalConfig.getInt("decayProtectionDays", FOOD_DECAY, decayProtectionDays, 1, 12000, "If a food item has not been ticked for >= this number of days than when it is ticked for the first time, only a small amount of decay will occur.", "config.gui.TFCConfig.fooddecay.decayProtectionDays");
 		decayMultiplier = generalConfig.getFloat("foodDecayMultiplier", FOOD_DECAY, decayMultiplier, 0.0f, 100.0f, "This is a global multiplier for food decay. Unlike FoodDecayRate which only modifies the base decay and not the environmental effect upon decay, this multiplier will multiply against the entire amount. Set to 0 to turn decay off.", "config.gui.TFCConfig.fooddecay.foodDecayMultiplier");
+		foodDecayRateInOtherContainers = generalConfig.getFloat("foodDecayRateInOtherContainers", FOOD_DECAY, foodDecayRateInOtherContainers, 1.0f, 99.0f, "Food decay multiplier for other (non-TFC) containers.", "config.gui.TFCConfig.fooddecay.foodDecayRateInOtherContainers");
 
 		generalConfig.setCategoryLanguageKey(CAVEIN_OPTIONS, "config.gui.TFCConfig.caveins");
 

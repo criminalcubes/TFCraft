@@ -2,6 +2,8 @@ package com.bioxx.tfc.Handlers;
 
 import java.util.Random;
 
+import net.minecraft.crash.CrashReport;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentTranslation;
 
 import net.minecraftforge.event.ServerChatEvent;

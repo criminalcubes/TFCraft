@@ -10,6 +10,8 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 import net.minecraft.world.World;
@@ -27,6 +29,7 @@ import com.bioxx.tfc.Core.Player.FoodStatsTFC;
 import com.bioxx.tfc.api.TFCBlocks;
 import com.bioxx.tfc.api.TFCItems;
 import com.bioxx.tfc.api.Util.Helper;
+import net.minecraftforge.event.entity.player.PlayerOpenContainerEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.event.world.BlockEvent;
 
@@ -128,7 +131,6 @@ public class PlayerInteractHandler
         closeClosestPlayersScreen(event.world, event.x, event.y, event.z);
 	}
 
-
 	private void closeClosestPlayersScreen(World world, int x, int y, int z)
     {
         if (!world.isRemote) {
@@ -145,4 +147,31 @@ public class PlayerInteractHandler
             }
         }
     }
+
+	/*
+    private Map<String, String> playerContainersMap = new HashMap<String, String>();
+
+	@SubscribeEvent
+	public void onOpeningContainer(PlayerOpenContainerEvent event)
+	{
+		if (!event.entityPlayer.openContainer.getClass().getName().equals("com.bioxx.tfc.Containers.ContainerPlayerTFC")) {
+
+			if (playerContainersMap.get(event.entityPlayer.getDisplayName()) == null || !event.entityPlayer.openContainer.getClass().getName().equals(playerContainersMap.get(event.entityPlayer.getDisplayName()))) {
+				playerContainersMap.put(event.entityPlayer.getDisplayName(), event.entityPlayer.openContainer.getClass().getName());
+
+				MinecraftServer.getServer().getConfigurationManager().sendChatMsg(new ChatComponentTranslation(event.entityPlayer.openContainer.getClass().getName()));
+
+				TFC_Core.handleItemTicking(
+						event.entityPlayer.openContainer,
+						event.entityPlayer.worldObj,
+						(int) event.entityPlayer.posX,
+						(int) event.entityPlayer.posY,
+						(int) event.entityPlayer.posZ,
+						100,
+						100
+				);
+			}
+		}
+	}
+	*/
 }
