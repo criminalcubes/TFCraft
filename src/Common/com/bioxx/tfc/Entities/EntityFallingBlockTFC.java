@@ -137,6 +137,19 @@ public class EntityFallingBlockTFC extends Entity implements IEntityAdditionalSp
 
 				if (this.onGround)
 				{
+					Block b = worldObj.getBlock(i, j, k);
+					if (!b.isOpaqueCube() && b.getBlockHardness(worldObj, i, j, k) < 0)
+					{
+						if (this.shouldDropItem)
+						{
+							EntityItem entityItem = this.entityDropItem(new ItemStack(this.block, 1, this.block.damageDropped(this.blockMeta)), 0.0F);
+							worldObj.spawnEntityInWorld(entityItem);
+						}
+
+						this.setDead();
+						return;
+					}
+
 					if(canReplace(worldObj, i, j, k))
 					{
 						worldObj.setBlockToAir(i, j, k);
@@ -230,18 +243,11 @@ public class EntityFallingBlockTFC extends Entity implements IEntityAdditionalSp
 	{
 		Block b = world.getBlock(x, y, z);
 		if (canDestroy(b) && (b.isAir(world, x, y, z) || 
-				!b.isOpaqueCube() && !b.renderAsNormalBlock() && !worldObj.isSideSolid(x, y, z, ForgeDirection.UP)) && b.getBlockHardness(worldObj, x, y, z) >= 0)
+				!b.isOpaqueCube() && !b.renderAsNormalBlock() && !worldObj.isSideSolid(x, y, z, ForgeDirection.UP)))
 			return TFC_Core.setBlockWithDrops(worldObj, x, y, z, getBlock(), this.blockMeta);
 		else if (b instanceof BlockOre && TFCOptions.enableCaveInsDestroyOre)
+		{
 			return world.setBlockToAir(x, y, z);
-		else if (b.getBlockHardness(worldObj, x, y, z) < 0) {
-			EntityItem blockItem = new EntityItem(world, this.posX, this.posY + 0.5, this.posZ, new ItemStack(Item.getItemFromBlock(getBlock())));
-			blockItem.motionX = 0;
-			blockItem.motionY = 0;
-			blockItem.motionZ = 0;
-			blockItem.delayBeforeCanPickup = 0;
-			world.spawnEntityInWorld(blockItem);
-			this.setDead();
 		}
 		return false;
 	}
