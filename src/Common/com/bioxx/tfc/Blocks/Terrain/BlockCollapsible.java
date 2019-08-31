@@ -28,6 +28,7 @@ import com.bioxx.tfc.api.Enums.TFCDirection;
 import com.bioxx.tfc.api.Util.ByteCoord;
 import com.bioxx.tfc.api.Util.CollapseData;
 import com.bioxx.tfc.api.Util.CollapseList;
+import org.lwjgl.Sys;
 
 public class BlockCollapsible extends BlockTerraContainer
 {
@@ -60,6 +61,8 @@ public class BlockCollapsible extends BlockTerraContainer
 	public static boolean canFallBelow(World world, int x, int y, int z)
 	{
 		Block block = world.getBlock(x, y, z);
+		if (!TFC_Core.blockCanBeDestroyed(world, x, y, z))
+			return false;
 		if (block.isAir(world, x, y, z))
 			return true;
 		if (block == Blocks.fire)

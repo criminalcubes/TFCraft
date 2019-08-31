@@ -11,9 +11,7 @@ import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
@@ -137,27 +135,24 @@ public class EntityFallingBlockTFC extends Entity implements IEntityAdditionalSp
 
 				if (this.onGround)
 				{
-					Block b = worldObj.getBlock(i, j, k);
-					if (!b.isOpaqueCube() && b.getBlockHardness(worldObj, i, j, k) < 0)
-					{
-						if (this.shouldDropItem)
-						{
-							EntityItem entityItem = this.entityDropItem(new ItemStack(this.block, 1, this.block.damageDropped(this.blockMeta)), 0.0F);
-							worldObj.spawnEntityInWorld(entityItem);
-						}
-
-						this.setDead();
-						return;
-					}
-
 					if(canReplace(worldObj, i, j, k))
 					{
 						worldObj.setBlockToAir(i, j, k);
+					}
+					else if(!TFC_Core.blockCanBeDestroyed(worldObj, i, j, k))
+					{
+						//if (this.shouldDropItem)
+						//{
+							this.entityDropItem(new ItemStack(this.block, 1, this.block.damageDropped(this.blockMeta)), 0.0F);
+						//}
+						this.setDead();
+						return;
 					}
 					else if(worldObj.getBlock(i, j, k).getBlockBoundsMaxY() < 1)
 					{
 						j++;
 					}
+
 					if(canReplace(worldObj, i, j-1, k))
 					{
 						//TFC_Core.setBlockToAirWithDrops(worldObj, i, j-1, k);
@@ -242,7 +237,7 @@ public class EntityFallingBlockTFC extends Entity implements IEntityAdditionalSp
 	public boolean canReplace(World world, int x, int y, int z)
 	{
 		Block b = world.getBlock(x, y, z);
-		if (canDestroy(b) && (b.isAir(world, x, y, z) || 
+		if (TFC_Core.blockCanBeDestroyed(worldObj, x, y, z) && canDestroy(b) && (b.isAir(world, x, y, z) ||
 				!b.isOpaqueCube() && !b.renderAsNormalBlock() && !worldObj.isSideSolid(x, y, z, ForgeDirection.UP)))
 			return TFC_Core.setBlockWithDrops(worldObj, x, y, z, getBlock(), this.blockMeta);
 		else if (b instanceof BlockOre && TFCOptions.enableCaveInsDestroyOre)

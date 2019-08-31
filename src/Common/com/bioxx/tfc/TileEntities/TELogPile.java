@@ -271,27 +271,27 @@ public class TELogPile extends TileEntity implements IInventory
 		blocksToBeSetOnFire = new ArrayDeque<Vector3f>();
 
 		block = worldObj.getBlock(xCoord + 1, yCoord, zCoord);
-		if(!TFC_Core.isValidCharcoalPitCover(block))
+		if(!TFC_Core.isValidCharcoalPitCover(block) && TFC_Core.blockCanBeDestroyed(worldObj, xCoord + 1, yCoord, zCoord))
 			blocksToBeSetOnFire.add(new Vector3f(xCoord + 1, yCoord, zCoord));
 
 		block = worldObj.getBlock(xCoord - 1, yCoord, zCoord);
-		if(!TFC_Core.isValidCharcoalPitCover(block))
+		if(!TFC_Core.isValidCharcoalPitCover(block) && TFC_Core.blockCanBeDestroyed(worldObj, xCoord - 1, yCoord, zCoord))
 			blocksToBeSetOnFire.add(new Vector3f(xCoord - 1, yCoord, zCoord));
 
 		block = worldObj.getBlock(xCoord, yCoord, zCoord + 1);
-		if(!TFC_Core.isValidCharcoalPitCover(block))
+		if(!TFC_Core.isValidCharcoalPitCover(block) && TFC_Core.blockCanBeDestroyed(worldObj, xCoord, yCoord, zCoord + 1))
 			blocksToBeSetOnFire.add(new Vector3f(xCoord, yCoord, zCoord + 1));
 
 		block = worldObj.getBlock(xCoord, yCoord, zCoord - 1);
-		if(!TFC_Core.isValidCharcoalPitCover(block))
+		if(!TFC_Core.isValidCharcoalPitCover(block) && TFC_Core.blockCanBeDestroyed(worldObj, xCoord, yCoord, zCoord - 1))
 			blocksToBeSetOnFire.add(new Vector3f(xCoord, yCoord, zCoord - 1));
 
 		block = worldObj.getBlock(xCoord, yCoord + 1, zCoord);
-		if(!TFC_Core.isValidCharcoalPitCover(block))
+		if(!TFC_Core.isValidCharcoalPitCover(block) && TFC_Core.blockCanBeDestroyed(worldObj, xCoord, yCoord + 1, zCoord))
 			blocksToBeSetOnFire.add(new Vector3f(xCoord, yCoord + 1, zCoord));
 
 		block = worldObj.getBlock(xCoord, yCoord - 1, zCoord);
-		if(!TFC_Core.isValidCharcoalPitCover(block))
+		if(!TFC_Core.isValidCharcoalPitCover(block) && TFC_Core.blockCanBeDestroyed(worldObj, xCoord, yCoord - 1, zCoord))
 			blocksToBeSetOnFire.add(new Vector3f(xCoord, yCoord - 1, zCoord));
 
 		setOnFire(blocksToBeSetOnFire);

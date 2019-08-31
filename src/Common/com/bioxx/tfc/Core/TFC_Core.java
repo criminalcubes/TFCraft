@@ -1254,9 +1254,16 @@ public class TFC_Core
 		return id == TFCBiome.BEACH.biomeID || id == TFCBiome.GRAVEL_BEACH.biomeID;
 	}
 
+	public static boolean blockCanBeDestroyed(World world, int x, int y, int z)
+	{
+		Block block = world.getBlock(x, y, z);
+		if (block.getBlockHardness(world, x, y, z) < 0) return false;
+
+		return true;
+	}
+
 	public static boolean isValidCharcoalPitCover(Block block)
 	{
-		if(block.getMaterial() == Material.iron) return true;
 		if(Blocks.fire.getFlammability(block) > 0 && block != TFCBlocks.logPile) return false;
 
 		return block == TFCBlocks.logPile
