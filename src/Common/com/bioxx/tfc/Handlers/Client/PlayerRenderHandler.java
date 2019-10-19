@@ -34,7 +34,7 @@ public class PlayerRenderHandler {
 						RENDER_QUIVER.render(e.entityLiving,i);
 					}
 					else if(i != null){
-						RENDER_LARGE.render(el, i);
+						RENDER_LARGE.render((EntityPlayer)el, e.renderer, i);
 					}
 				}
 			}

@@ -14,6 +14,7 @@ import com.bioxx.tfc.Reference;
 public class RenderBoar extends RenderLiving {
 
     private static final ResourceLocation BOAR_TEXTURE = new ResourceLocation(Reference.MOD_ID, "textures/mob/boar.png");
+    //private static final ResourceLocation BOAR_TEXTURE = new ResourceLocation(Reference.MOD_ID, "textures/mob/vepr.png");
 
     public RenderBoar(ModelBase par1ModelBase, float par3) {
         super(par1ModelBase, par3);

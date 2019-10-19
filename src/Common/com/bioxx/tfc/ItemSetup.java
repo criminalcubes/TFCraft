@@ -892,6 +892,8 @@ public class ItemSetup extends TFCItems {
 
 		fruitTreeSapling = new ItemFruitTreeSapling().setUnlocalizedName("FruitSapling");
 
+		burningBranch = new ItemBurningBranch().setUnlocalizedName("burningBranch");
+
 		//mushroom is a food now, with foodID 61
 		//pumpkin is a food now, id = 61
 		//melon is a food, not currently obtainable. id = 62. See ItemFoodBlock

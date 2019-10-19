@@ -2,13 +2,16 @@ package com.bioxx.tfc.Handlers;
 
 import com.bioxx.tfc.Containers.ContainerTFC;
 import com.bioxx.tfc.TileEntities.NetworkTileEntity;
+import com.bioxx.tfc.api.TFC_ItemHeat;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.relauncher.Side;
+import joptsimple.internal.Strings;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IInvBasic;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
@@ -22,6 +25,10 @@ import com.bioxx.tfc.Core.TFC_Core;
 import com.bioxx.tfc.Core.TFC_Time;
 import com.bioxx.tfc.api.TFCOptions;
 import net.minecraft.world.WorldServer;
+import net.minecraft.world.chunk.Chunk;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.world.ChunkEvent;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.util.*;
 
@@ -30,7 +37,11 @@ public class ServerTickHandler
 	private long wSeed = Long.MIN_VALUE;
 	public int ticks;
 
-	private static long  lastInvTickTime = 0;
+	private long lastInvTickTime = 0;
+	private long minContainersTickPeriod = 1000;
+	private int itemHeatingCount = 99;
+	private boolean processingContainers = false;
+	private List<Boolean> processingContainersStatuses = Collections.synchronizedList(new ArrayList<Boolean>());
 
 	@SubscribeEvent
 	public void onServerWorldTick(WorldTickEvent event)
@@ -69,41 +80,141 @@ public class ServerTickHandler
 		}*/
 	}
 
+	private List<String> teBlacklist = Arrays.asList(
+			"sladki.tfc.ab.TileEntities.TEPotteryKiln",
+			"cubex2.mods.multipagechest.TileEntityMultiPageChest",
+			"com.bioxx.tfc.TileEntities.TEChest",
+			"sladki.tfc.TileEntities.TECellarShelf",
+			"com.bioxx.tfc.TileEntities.TEFruitTreeWood",
+			"sladki.tfc.TileEntities.TEIceBunker",
+			"com.bioxx.tfc.TileEntities.TESluice",
+			"com.bioxx.tfc.TileEntities.TENestBox",
+			"com.bioxx.tfc.TileEntities.TELogPile"
+	);
+
 	@SubscribeEvent
 	public void onServerTick(WorldTickEvent event) {
 		if (event.side == Side.SERVER) {
+			updateProcessingChunks();
 			long now = MinecraftServer.getSystemTimeMillis();
-			if (now - lastInvTickTime >= 30000) {
+			if (!processingContainers && now - lastInvTickTime >= minContainersTickPeriod) {
+				processingContainers = true;
 				lastInvTickTime = now;
 
-				int eCounter = 0;
-				int teCounter = 0;
-				for (WorldServer worldServer : MinecraftServer.getServer().worldServers) {
-					List<TileEntity> tileEntityList = new ArrayList<TileEntity>(worldServer.loadedTileEntityList);
+				int worldCounter = 0;
+				for (final WorldServer ws : MinecraftServer.getServer().worldServers) {
+					processingContainersStatuses.add(false);
+					final int innerWorldCounter = worldCounter;
 
-					for (Iterator<TileEntity> teIterator = tileEntityList.iterator(); teIterator.hasNext();) {
-						TileEntity te = teIterator.next();
-						if (te instanceof IInventory && !(te instanceof NetworkTileEntity)) {
-							IInventory iinv = (IInventory) te;
-							TFC_Core.handleItemTicking(iinv, te.getWorldObj(), te.xCoord, te.yCoord, te.zCoord, TFCOptions.foodDecayRateInOtherContainers);
-							teCounter++;
+					Runnable filterTask = new Runnable() {
+						@Override
+						public void run() {
+							try {
+								int eCounter = 0;
+								int teCounter = 0;
+								Map<String, Integer> containersMap = new HashMap<String, Integer>();
+
+								List<Chunk> chunks = new ArrayList<Chunk>(ws.theChunkProviderServer.loadedChunks);
+
+								Iterator iterator = chunks.iterator();
+								while (iterator.hasNext()) {
+									Chunk chunk = (Chunk) iterator.next();
+
+									List<TileEntity> tileEntityList = new ArrayList<TileEntity>(chunk.chunkTileEntityMap.values());
+									for (Object obj : tileEntityList) {
+										TileEntity te = (TileEntity) obj;
+
+										if (teBlacklist.contains(te.getClass().getName())) {
+											continue;
+										}
+
+										if (te instanceof IInventory && !(te instanceof NetworkTileEntity)) {
+											IInventory iinv = (IInventory) te;
+											TFC_Core.handleItemTicking(iinv, te.getWorldObj(), te.xCoord, te.yCoord, te.zCoord, TFCOptions.foodDecayRate);
+											for (int i = 0; i < iinv.getSizeInventory(); i++) {
+												ItemStack is = iinv.getStackInSlot(i);
+												if (is != null) {
+													for (int j = 0; j < itemHeatingCount; j++) {
+														TFC_ItemHeat.handleItemHeat(is);
+													}
+												}
+											}
+
+											teCounter++;
+
+											String key = te.getClass().getName();
+											if (containersMap.get(key) == null) {
+												containersMap.put(key, 1);
+											} else {
+												containersMap.put(key, containersMap.get(key) + 1);
+											}
+										}
+									}
+
+									for (List l : chunk.entityLists) {
+										List<Entity> entityList = new ArrayList<Entity>(l);
+										for (Entity e : entityList) {
+											if (e instanceof IInventory) {
+												IInventory iinv = (IInventory) e;
+												TFC_Core.handleItemTicking(iinv, e.worldObj, (int)e.posX, (int)e.posY, (int)e.posZ, TFCOptions.foodDecayRate);
+												for (int i = 0; i < iinv.getSizeInventory(); i++) {
+													ItemStack is = iinv.getStackInSlot(i);
+													if (is != null) {
+														for (int j = 0; j < itemHeatingCount; j++) {
+															TFC_ItemHeat.handleItemHeat(is);
+														}
+													}
+												}
+
+												eCounter++;
+
+												String key = e.getClass().getName();
+												if (containersMap.get(key) == null) {
+													containersMap.put(key, 1);
+												} else {
+													containersMap.put(key, containersMap.get(key) + 1);
+												}
+											}
+										}
+									}
+								}
+
+
+								/*
+								System.out.println("[TerraFirmaCraft][DIM" + ws.provider.dimensionId + "] HandleItemTicking: tileEntities - " + teCounter + ", entities - " + eCounter);
+								for (Map.Entry entry : containersMap.entrySet()) {
+									System.out.println("[TerraFirmaCraft][DIM" + ws.provider.dimensionId + "] " + entry.getValue() + " - " + entry.getKey());
+								}
+								*/
+							} catch (Exception e) {
+								System.out.println("[TerraFirmaCraft][ERROR] Error on " + Thread.currentThread().getName() + ": " + ExceptionUtils.getRootCauseMessage(e));
+								e.printStackTrace();
+							}
+
+							processingContainersStatuses.set(innerWorldCounter, true);
+							Thread.currentThread().interrupt();
 						}
-					}
+					};
 
-					List<Entity> entityList = new ArrayList<Entity>(worldServer.loadedEntityList);
+					Thread thread = new Thread(filterTask, "containersTickThread-DIM" + ws.provider.dimensionId);
+					thread.start();
 
-					for (Iterator<Entity> eIterator = entityList.iterator(); eIterator.hasNext();) {
-						Entity e = eIterator.next();
-						if (e instanceof IInventory) {
-							IInventory iinv = (IInventory) e;
-							TFC_Core.handleItemTicking(iinv, e.worldObj, (int)e.posX, (int)e.posY, (int)e.posZ, TFCOptions.foodDecayRateInOtherContainers);
-                            eCounter++;
-						}
-					}
+					worldCounter++;
 				}
-
-				System.out.println("[TerraFirmaCraft] HandleItemTicking: tileEntities - " + teCounter + ", entities - " + eCounter);
 			}
+		}
+	}
+
+	private void updateProcessingChunks() {
+		int stat = 0;
+		for (Boolean status : processingContainersStatuses) {
+			if (status) {
+				stat++;
+			}
+		}
+		if (stat == processingContainersStatuses.size()) {
+			processingContainers = false;
+			processingContainersStatuses.clear();
 		}
 	}
 }

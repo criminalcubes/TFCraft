@@ -1,15 +1,21 @@
 package com.bioxx.tfc.Entities.Mobs;
 
 import com.bioxx.tfc.Core.TFC_Core;
+import com.bioxx.tfc.Entities.AI.EntityAILightPanic;
+import com.bioxx.tfc.Entities.AI.EntityAIPanicTFC;
 import com.bioxx.tfc.api.TFCItems;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EnumCreatureAttribute;
 import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.*;
 import net.minecraft.entity.monster.EntityMob;
+import net.minecraft.entity.passive.EntityVillager;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
@@ -19,18 +25,30 @@ import com.bioxx.tfc.api.Enums.EnumDamageType;
 import com.bioxx.tfc.api.Interfaces.ICausesDamage;
 
 public class EntityBoar extends EntityMob implements ICausesDamage {
+
+    private float moveSpeed = 0.4F;
+
     public EntityBoar(World par1World) {
         super(par1World);
+
+        this.tasks.addTask(0, new EntityAISwimming(this));
+        this.tasks.addTask(1, new EntityAIAttackOnCollide(this, EntityPlayer.class, moveSpeed, false));
+        this.tasks.addTask(2, new EntityAIMoveTowardsRestriction(this, moveSpeed));
+        this.tasks.addTask(3, new EntityAIWander(this, moveSpeed));
+        this.tasks.addTask(4, new EntityAILookIdle(this));
+        this.targetTasks.addTask(1, new EntityAIHurtByTarget(this, true));
+        this.targetTasks.addTask(2, new EntityAINearestAttackableTarget(this, EntityPlayer.class, 0, true));
+
+        this.setSize(0.9F, 0.9F);
+        this.setCanPickUpLoot(false);
+        this.experienceValue = 6;
     }
 
-    @Override
     protected void applyEntityAttributes() {
         super.applyEntityAttributes();
         this.getEntityAttribute(SharedMonsterAttributes.attackDamage).setBaseValue(TFC_MobData.BOAR_DAMAGE);
         this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(TFC_MobData.BOAR_HEALTH);
         this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(TFC_MobData.BOAR_SPEED);
-        this.setSize(0.9F, 0.9F);
-        this.setCanPickUpLoot(false);
     }
 
     @Override
@@ -112,11 +130,29 @@ public class EntityBoar extends EntityMob implements ICausesDamage {
             this.dropItem(Items.bone, rand.nextInt(2));
         }
 
-        TFC_Core.animalDropMeat(this, TFCItems.porkchopRaw, (float) Math.random() * 10000 / 2);
+        TFC_Core.animalDropMeat(this, TFCItems.porkchopRaw, (float) Math.random() * 5000 / 2);
     }
 
     @Override
     public EnumCreatureAttribute getCreatureAttribute() {
         return EnumCreatureAttribute.UNDEFINED;
+    }
+
+    public void writeEntityToNBT(NBTTagCompound p_70014_1_) {
+        super.writeEntityToNBT(p_70014_1_);
+    }
+
+    public void readEntityFromNBT(NBTTagCompound p_70037_1_) {
+        super.readEntityFromNBT(p_70037_1_);
+    }
+
+    protected boolean isAIEnabled() {
+        return true;
+    }
+
+    @Override
+    public float getAIMoveSpeed()
+    {
+        return this.isAIEnabled() ? moveSpeed : 0.4F;
     }
 }

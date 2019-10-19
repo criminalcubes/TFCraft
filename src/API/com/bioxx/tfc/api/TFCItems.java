@@ -810,6 +810,8 @@ public class TFCItems
 	public static Item salad;
 	public static Item shears;
 
+	public static Item burningBranch;
+
 	/**
 	 * Item Uses Setup
 	 * */
@@ -1655,6 +1657,9 @@ public class TFCItems
 		GameRegistry.registerItem(sugar, sugar.getUnlocalizedName());
 
 		GameRegistry.registerItem(shears, shears.getUnlocalizedName());
+
+
+		GameRegistry.registerItem(burningBranch, burningBranch.getUnlocalizedName());
 
 		TerraFirmaCraft.LOG.info("All Items Registered");
 	}

@@ -85,7 +85,7 @@ public class EntityBear extends EntityTameable implements ICausesDamage, IAnimal
 	public EntityBear (World par1World)
 	{
 		super (par1World);
-		setSize (1.2F, 1.2F);
+		setSize (0.9F, 0.9F);
 		moveSpeed = 0.4F;
 		getNavigator ().setAvoidsWater (true);
 		tasks.addTask (1, new EntityAISwimming (this));
@@ -962,5 +962,11 @@ public class EntityBear extends EntityTameable implements ICausesDamage, IAnimal
 		nbt.setFloat("MateObed", mateObedMod);
 		nbt.setLong("ConceptionTime",timeOfConception);
 		nbt.setInteger("Age", getBirthDay());
+	}
+
+	@Override
+	public float getAIMoveSpeed()
+	{
+		return this.isAIEnabled() ? moveSpeed : 0.4F;
 	}
 }

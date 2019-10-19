@@ -293,7 +293,7 @@ public class EntityBandit extends EntityMob implements ICausesDamage, IInnateArm
     }
 
     protected void func_145780_a(int p_145780_1_, int p_145780_2_, int p_145780_3_, Block p_145780_4_) {
-        this.playSound("step.wood", 0.15F, 1.0F);
+        this.playSound("step.grass", 0.15F, 1.0F);
     }
 
     public boolean attackEntityFrom(DamageSource source, float damage) {
@@ -331,7 +331,7 @@ public class EntityBandit extends EntityMob implements ICausesDamage, IInnateArm
             try {
                 this.dropItem(gems[this.rand.nextInt(gems.length)], 1);
             } catch (Exception e) {
-                System.out.println("Error on dropping gem from bandit!");
+                System.out.println("[TerraFirmaCraft] Error on dropping gem from bandit!");
             }
         }
     }
@@ -340,7 +340,7 @@ public class EntityBandit extends EntityMob implements ICausesDamage, IInnateArm
         try {
             this.dropItem(metals[this.rand.nextInt(metals.length)], 1);
         } catch (Exception e) {
-            System.out.println("Error on dropping metal from bandit!");
+            System.out.println("[TerraFirmaCraft] Error on dropping metal from bandit!");
         }
     }
 
