@@ -11,7 +11,10 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
 
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.world.WorldManager;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 
@@ -97,7 +100,7 @@ public class EntitySpawnHandler
 				int lowLevelPlayers = 0;
 				for (Iterator iterator = e.iterator(); iterator.hasNext();) {
 					EntityPlayer player = (EntityPlayer) iterator.next();
-					if (player.getMaxHealth() <= 1000) {
+					if (!player.capabilities.isCreativeMode && player.getMaxHealth() <= 1000) {
 						lowLevelPlayers++;
 						playersString += player.getDisplayName() + " ";
 					}
@@ -111,7 +114,8 @@ public class EntitySpawnHandler
 			if (cancelSpawn && Math.random() <= 0.3) {
 				System.out.println("[TerraFirmaCraft] Cancel spawn of " + event.entity.getCommandSenderName() + " near of weak player(s): " + playersString);
 				event.entity.setDead();
-				event.setCanceled(true);
+				WorldManager worldManager = new WorldManager(MinecraftServer.getServer(), (WorldServer) event.entity.worldObj);
+				worldManager.onEntityDestroy(event.entity);
 			}
 		}
 	}

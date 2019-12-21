@@ -41,7 +41,7 @@ public class FoodStatsTFC
 	public float nutrProtein = 1.0f;
 	private boolean sendUpdate = true;
 
-	public long soberTime;
+	public long soberTime = 0;
 
 	/**This is how full the player is from the food that they've eaten.
 	 * It could also be how happy they are with what they've eaten*/
@@ -501,10 +501,19 @@ public class FoodStatsTFC
 	public void consumeAlcohol()
 	{
 		//TODO: Add a parameter for alcohol strength
-		if(soberTime <= TFC_Time.getTotalTicks())
-			soberTime = TFC_Time.getTotalTicks() + player.worldObj.rand.nextInt(1000) + 400;
-		else
-			soberTime += player.worldObj.rand.nextInt(1000) + 400;
+		if (this.soberTime <= TFC_Time.getTotalTicks()) {
+			this.soberTime = TFC_Time.getTotalTicks() + player.worldObj.rand.nextInt(1000) + 400;
+		} else {
+			this.soberTime += player.worldObj.rand.nextInt(1000) + 400;
+		}
 		sendUpdate = true;
+		this.writeNBT(player.getEntityData());
+	}
+
+	public void cleanAlcohol()
+	{
+		this.soberTime = 0;
+		sendUpdate = true;
+		this.writeNBT(player.getEntityData());
 	}
 }

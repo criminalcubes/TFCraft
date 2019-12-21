@@ -92,6 +92,10 @@ public class ServerTickHandler
 			"com.bioxx.tfc.TileEntities.TELogPile"
 	);
 
+	private List<String> teWhitelist = Arrays.asList(
+			"udary.tfcudarymod.tileentities.devices.TileEntityAlloyCalculator"
+	);
+
 	@SubscribeEvent
 	public void onServerTick(WorldTickEvent event) {
 		if (event.side == Side.SERVER) {
@@ -120,43 +124,18 @@ public class ServerTickHandler
 								while (iterator.hasNext()) {
 									Chunk chunk = (Chunk) iterator.next();
 
-									List<TileEntity> tileEntityList = new ArrayList<TileEntity>(chunk.chunkTileEntityMap.values());
-									for (Object obj : tileEntityList) {
-										TileEntity te = (TileEntity) obj;
+									if (chunk.chunkTileEntityMap != null && chunk.chunkTileEntityMap.values() != null) {
+										List<TileEntity> tileEntityList = new ArrayList<TileEntity>(chunk.chunkTileEntityMap.values());
+										for (Object obj : tileEntityList) {
+											TileEntity te = (TileEntity) obj;
 
-										if (teBlacklist.contains(te.getClass().getName())) {
-											continue;
-										}
-
-										if (te instanceof IInventory && !(te instanceof NetworkTileEntity)) {
-											IInventory iinv = (IInventory) te;
-											TFC_Core.handleItemTicking(iinv, te.getWorldObj(), te.xCoord, te.yCoord, te.zCoord, TFCOptions.foodDecayRate);
-											for (int i = 0; i < iinv.getSizeInventory(); i++) {
-												ItemStack is = iinv.getStackInSlot(i);
-												if (is != null) {
-													for (int j = 0; j < itemHeatingCount; j++) {
-														TFC_ItemHeat.handleItemHeat(is);
-													}
-												}
+											if (teBlacklist.contains(te.getClass().getName())) {
+												continue;
 											}
 
-											teCounter++;
-
-											String key = te.getClass().getName();
-											if (containersMap.get(key) == null) {
-												containersMap.put(key, 1);
-											} else {
-												containersMap.put(key, containersMap.get(key) + 1);
-											}
-										}
-									}
-
-									for (List l : chunk.entityLists) {
-										List<Entity> entityList = new ArrayList<Entity>(l);
-										for (Entity e : entityList) {
-											if (e instanceof IInventory) {
-												IInventory iinv = (IInventory) e;
-												TFC_Core.handleItemTicking(iinv, e.worldObj, (int)e.posX, (int)e.posY, (int)e.posZ, TFCOptions.foodDecayRate);
+											if (te instanceof IInventory && (teWhitelist.contains(te.getClass().getName()) || !(te instanceof NetworkTileEntity))) {
+												IInventory iinv = (IInventory) te;
+												TFC_Core.handleItemTicking(iinv, te.getWorldObj(), te.xCoord, te.yCoord, te.zCoord, TFCOptions.foodDecayRate);
 												for (int i = 0; i < iinv.getSizeInventory(); i++) {
 													ItemStack is = iinv.getStackInSlot(i);
 													if (is != null) {
@@ -166,9 +145,9 @@ public class ServerTickHandler
 													}
 												}
 
-												eCounter++;
+												teCounter++;
 
-												String key = e.getClass().getName();
+												String key = te.getClass().getName();
 												if (containersMap.get(key) == null) {
 													containersMap.put(key, 1);
 												} else {
@@ -177,8 +156,37 @@ public class ServerTickHandler
 											}
 										}
 									}
-								}
 
+									if (chunk.entityLists != null) {
+										List<List> entityListsList = Arrays.asList(chunk.entityLists);
+										for (List l : entityListsList) {
+											List<Entity> entityList = new ArrayList<Entity>(l);
+											for (Entity e : entityList) {
+												if (e instanceof IInventory) {
+													IInventory iinv = (IInventory) e;
+													TFC_Core.handleItemTicking(iinv, e.worldObj, (int)e.posX, (int)e.posY, (int)e.posZ, TFCOptions.foodDecayRate);
+													for (int i = 0; i < iinv.getSizeInventory(); i++) {
+														ItemStack is = iinv.getStackInSlot(i);
+														if (is != null) {
+															for (int j = 0; j < itemHeatingCount; j++) {
+																TFC_ItemHeat.handleItemHeat(is);
+															}
+														}
+													}
+
+													eCounter++;
+
+													String key = e.getClass().getName();
+													if (containersMap.get(key) == null) {
+														containersMap.put(key, 1);
+													} else {
+														containersMap.put(key, containersMap.get(key) + 1);
+													}
+												}
+											}
+										}
+									}
+								}
 
 								/*
 								System.out.println("[TerraFirmaCraft][DIM" + ws.provider.dimensionId + "] HandleItemTicking: tileEntities - " + teCounter + ", entities - " + eCounter);
@@ -187,7 +195,7 @@ public class ServerTickHandler
 								}
 								*/
 							} catch (Exception e) {
-								System.out.println("[TerraFirmaCraft][ERROR] Error on " + Thread.currentThread().getName() + ": " + ExceptionUtils.getRootCauseMessage(e));
+								System.out.println("[TerraFirmaCraft] (ERROR) Error on " + Thread.currentThread().getName() + ": " + ExceptionUtils.getRootCauseMessage(e));
 								e.printStackTrace();
 							}
 

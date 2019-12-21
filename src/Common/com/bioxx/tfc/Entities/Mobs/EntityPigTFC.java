@@ -577,7 +577,7 @@ public class EntityPigTFC extends EntityPig implements IAnimal
 		try {
 			super.onLivingUpdate();
 		} catch (Exception e) {
-			System.out.println("Error on living update pig: " + e.getMessage());
+			System.out.println("[TerraFirmaCraft] (ERROR) Error on living update pig: " + e.getMessage());
 		}
 		TFC_Core.preventEntityDataUpdate = false;
 

@@ -18,6 +18,7 @@ public class ChatListenerTFC
 	@SubscribeEvent
 	public void onServerChatEvent(ServerChatEvent event)
 	{
+		/*
 		String msg = event.message;
 		long soberTime = TFC_Core.getPlayerFoodStats(event.player).soberTime;
 		if(soberTime > TFC_Time.getTotalTicks())
@@ -55,5 +56,6 @@ public class ChatListenerTFC
 			}
 			event.component = new ChatComponentTranslation("<" + event.username + "> " + msg);
 		}
+		*/
 	}
 }

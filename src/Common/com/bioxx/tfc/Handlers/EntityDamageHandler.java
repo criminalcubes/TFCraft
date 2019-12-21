@@ -119,7 +119,7 @@ public class EntityDamageHandler
 			}
 			else if (event.source == DamageSource.outOfWorld)
 			{
-				System.out.println("OUT OF WORLD ENTITY " + entity.getCommandSenderName() + " COORDS: " + entity.posX + " " + entity.posY + " " + entity.posZ);
+				System.out.println("[TerraFirmaCraft] (WARN ) Out of world entity " + entity.getCommandSenderName() + " COORDS: " + entity.posX + " " + entity.posY + " " + entity.posZ);
 				if (entity instanceof EntityPlayer) {
 					// Prevent bed > y=127 bug
 					if (entity.posY > 0) {
@@ -177,7 +177,7 @@ public class EntityDamageHandler
 					}
 				}
 			} else {
-				System.out.println("WARN: Damage type is not registered: " + event.source.damageType);
+				System.out.println("[TerraFirmaCraft] (WARN) Damage type is not registered: " + event.source.damageType);
 			}
 
 			if ((newDamage != initialDamage) && (entity.getHealth() > 0) && !entity.isDead) {

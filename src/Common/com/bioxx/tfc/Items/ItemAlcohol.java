@@ -114,6 +114,7 @@ public class ItemAlcohol extends ItemTerra
 				player.addPotionEffect(new PotionEffect(13,time,4));
 			}
 			int levelMod = 250*player.experienceLevel;
+
 			if(fs.soberTime >TFC_Time.getTotalTicks()+3000+levelMod){
 				/*if(rand.nextInt(4)==0){
 					//player.addPotionEffect(new PotionEffect(9,time,4));
@@ -132,7 +133,7 @@ public class ItemAlcohol extends ItemTerra
 							}
 						}
 						if(fs.soberTime > TFC_Time.getTotalTicks()+10000+levelMod && !player.capabilities.isCreativeMode){
-							fs.soberTime = 0;
+							fs.cleanAlcohol();
 
 							player.attackEntityFrom(new DamageSource("alcohol").setDamageBypassesArmor().setDamageIsAbsolute(), player.getMaxHealth());
 						}
@@ -140,7 +141,8 @@ public class ItemAlcohol extends ItemTerra
 
 				}
 			}
-			TFC_Core.setPlayerFoodStats(player, fs);
+			//fs.writeNBT(player.getEntityData());
+			//TFC_Core.setPlayerFoodStats(player, fs);
 		}
 
 		// First try to add the empty bottle to an existing stack of bottles in the inventory

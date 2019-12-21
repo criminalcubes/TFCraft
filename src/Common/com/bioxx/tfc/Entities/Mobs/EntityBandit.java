@@ -331,7 +331,7 @@ public class EntityBandit extends EntityMob implements ICausesDamage, IInnateArm
             try {
                 this.dropItem(gems[this.rand.nextInt(gems.length)], 1);
             } catch (Exception e) {
-                System.out.println("[TerraFirmaCraft] Error on dropping gem from bandit!");
+                System.out.println("[TerraFirmaCraft] (ERROR) Error on dropping gem from bandit!");
             }
         }
     }
@@ -340,7 +340,7 @@ public class EntityBandit extends EntityMob implements ICausesDamage, IInnateArm
         try {
             this.dropItem(metals[this.rand.nextInt(metals.length)], 1);
         } catch (Exception e) {
-            System.out.println("[TerraFirmaCraft] Error on dropping metal from bandit!");
+            System.out.println("[TerraFirmaCraft] (ERROR) Error on dropping metal from bandit!");
         }
     }
 
