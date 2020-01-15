@@ -53,37 +53,7 @@ public class PlayerRenderHandler {
 			}
 		}
 	}
-	private int checkShield(EntityPlayer player) {
-		//Checking for an equipped shield
-		if (player.inventory instanceof InventoryPlayerTFC) {
-			ItemStack[] extraEquipInv = ((InventoryPlayerTFC) player.inventory).extraEquipInventory;
-			boolean hasShield = false;
 
-			for (ItemStack itemStack : extraEquipInv) {
-				if (itemStack != null && itemStack.getItem() instanceof ItemBarrels) {
-					hasShield = true;
-					break;
-				}
-			}
-
-			//if(!hasShield) {
-			return 0;
-			//}
-			//}
-
-		/*//Checking for a shield mount (TRUE if a player is holding weapon in the main hand)
-		if(player.getCurrentEquippedItem() != null) {
-		if(player.getCurrentEquippedItem().getItem() instanceof ItemWeapon
-		|| player.getCurrentEquippedItem().getItem() instanceof ItemCustomAxe) {
-		return EnumShieldStatus.IN_HAND;
-		}
-		}
-
-		return EnumShieldStatus.ON_BACK;*/
-
-		}
-		return 0;
-	}
 	@SubscribeEvent
 	public void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent e) {
 
