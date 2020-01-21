@@ -1,6 +1,7 @@
 package com.bioxx.tfc.Render;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -22,19 +23,22 @@ public class RenderQuiver {
 	public RenderQuiver(){
 
 	}
-
 	public void render(EntityLivingBase entity, ItemStack item) {
 		this.doRender(entity, item);
 	}
+	public void render(EntityLivingBase entity, ItemStack item, RenderPlayer renderModel) {
+		this.doRender(entity, item,renderModel);
+	}
 
-	public void doRender(EntityLivingBase entity, ItemStack item){
+	public void doRender(EntityLivingBase entity, ItemStack item,RenderPlayer renderModel){
 		float entityTranslateY = entity instanceof EntityPlayer ? 0F : -1.5F;
 		GL11.glPushMatrix();
+		renderModel.modelBipedMain.bipedBody.postRender(0.0625f);
 		Minecraft.getMinecraft().renderEngine.bindTexture(QUIVER_TEXTURE);
 		if (!entity.isSneaking()){ GL11.glTranslatef(0F,  entityTranslateY + 0.0F/*0.65F*/, 0.1F);
 		}
 		else{ GL11.glTranslatef(0F,  entityTranslateY + 0.1F/*0.55F*/, 0.1F);
-		GL11.glRotatef(20F, 1F, 0F, 0F);}
+			GL11.glRotatef(20F, 1F, 0F, 0F);}
 		if(item != null){
 			if(item.getItem() instanceof IEquipable){
 				((IEquipable)(item.getItem())).onEquippedRender();
@@ -46,6 +50,24 @@ public class RenderQuiver {
 		}
 		GL11.glPopMatrix();
 	}
-
+	public void doRender(EntityLivingBase entity, ItemStack item){
+		float entityTranslateY = entity instanceof EntityPlayer ? 0F : -1.5F;
+		GL11.glPushMatrix();
+		Minecraft.getMinecraft().renderEngine.bindTexture(QUIVER_TEXTURE);
+		if (!entity.isSneaking()){ GL11.glTranslatef(0F,  entityTranslateY + 0.0F/*0.65F*/, 0.1F);
+		}
+		else{ GL11.glTranslatef(0F,  entityTranslateY + 0.1F/*0.55F*/, 0.1F);
+			GL11.glRotatef(20F, 1F, 0F, 0F);}
+		if(item != null){
+			if(item.getItem() instanceof IEquipable){
+				((IEquipable)(item.getItem())).onEquippedRender();
+			}
+			if(entity instanceof EntitySkeletonTFC)
+				this.quiver.render(entity,16);
+			else
+				this.quiver.render(entity,(((ItemQuiver)item.getItem()).getQuiverArrows(item))/8);
+		}
+		GL11.glPopMatrix();
+	}
 
 }

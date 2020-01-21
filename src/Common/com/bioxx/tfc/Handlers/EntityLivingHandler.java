@@ -1,7 +1,13 @@
 package com.bioxx.tfc.Handlers;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
+import com.bioxx.tfc.Handlers.Network.PlayerEquipUpdatePacket;
+import com.bioxx.tfc.Items.ItemBlocks.ItemBarrels;
+import cpw.mods.fml.common.network.NetworkRegistry;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
@@ -14,6 +20,8 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 
+import cpw.mods.fml.common.network.NetworkRegistry.TargetPoint;
+import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.client.event.FOVUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
@@ -53,6 +61,7 @@ import com.bioxx.tfc.api.Util.Helper;
 
 public class EntityLivingHandler
 {
+	private static HashMap<Integer, Integer> equipMap = new HashMap();
 	@SubscribeEvent
 	public void onEntityLivingUpdate(LivingUpdateEvent event)
 	{
@@ -69,6 +78,35 @@ public class EntityLivingHandler
 
 			if(!player.worldObj.isRemote)
 			{
+
+
+				/*
+				 * Here barrels of other players packet request.
+				 *
+				 * */
+
+				if (MinecraftServer.getServer().getTickCounter() % 120 == 0) {
+					if (player.inventory instanceof InventoryPlayerTFC) {
+						ItemStack[] extraEquipInv = ((InventoryPlayerTFC) player.inventory).extraEquipInventory;
+						if (extraEquipInv[0] == null) {
+							AbstractPacket packet = new PlayerEquipUpdatePacket(null,player.getEntityId());
+							TerraFirmaCraft.PACKET_PIPELINE.sendToAllAround(packet, new TargetPoint(player.dimension, player.posX, player.posY, player.posZ, 64.f));
+
+
+						}
+						for (ItemStack itemStack : extraEquipInv) {
+							if (itemStack != null /*&& itemStack.getItem() instanceof ItemBarrels*/) {
+								AbstractPacket packet = new PlayerEquipUpdatePacket(new ItemStack(extraEquipInv[0].getItem(),1,extraEquipInv[0].getItemDamage()),player.getEntityId());
+								TerraFirmaCraft.PACKET_PIPELINE.sendToAllAround(packet, new TargetPoint(player.dimension, player.posX, player.posY, player.posZ, 64.f));
+								//currentEquip = itemStack.getItem().getDamage(itemStack);
+								break;
+							}
+						}
+
+
+					}
+				}
+
 				//Tick Decay
 				TFC_Core.handleItemTicking(player.inventory.mainInventory, player.worldObj, (int)player.posX, (int)player.posY, (int)player.posZ);
 				//Handle Food
