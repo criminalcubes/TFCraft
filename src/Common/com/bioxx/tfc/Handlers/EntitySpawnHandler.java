@@ -82,7 +82,7 @@ public class EntitySpawnHandler
 			mob.tasks.addTask(0, new EntityAILightPanic(mob, 1.5F));
 		}
 
-		if (event.entity instanceof EntityMob && !event.entity.getClass().getName().toLowerCase().contains("custom"))
+		if (!event.world.isRemote &&  event.entity instanceof EntityMob && !event.entity.getClass().getName().toLowerCase().contains("custom"))
 		{
 			boolean cancelSpawn = false;
 			int radius = 32;
