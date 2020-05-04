@@ -13,17 +13,18 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 
-public class PlayerEquipUpdatePacket extends  AbstractPacket{
+public class PlayerEquipUpdatePacket extends AbstractPacket {
     private int playerId;
 
     private ItemStack stack = null;
 
 
-    public PlayerEquipUpdatePacket() {}
+    public PlayerEquipUpdatePacket() {
+    }
 
     public PlayerEquipUpdatePacket(ItemStack stack, int playerId) {
         this.playerId = playerId;
-       this.stack = stack;
+        this.stack = stack;
     }
 
     @Override
@@ -34,9 +35,7 @@ public class PlayerEquipUpdatePacket extends  AbstractPacket{
         try {
             pb.writeItemStackToBuffer(this.stack);
             pb.writeInt(playerId);
-        }
-        catch (Exception IOException)
-        {
+        } catch (Exception IOException) {
 
         }
     }
@@ -48,11 +47,9 @@ public class PlayerEquipUpdatePacket extends  AbstractPacket{
 
 
         try {
-           this.stack =  pb.readItemStackFromBuffer();
-           this.playerId = pb.readInt();
-        }
-        catch (Exception IOException)
-        {
+            this.stack = pb.readItemStackFromBuffer();
+            this.playerId = pb.readInt();
+        } catch (Exception IOException) {
 
         }
 
@@ -60,17 +57,18 @@ public class PlayerEquipUpdatePacket extends  AbstractPacket{
 
     @Override
     public void handleClientSide(EntityPlayer player) {
-      if(Minecraft.getMinecraft().thePlayer.getEntityId() == playerId) {
+        if (Minecraft.getMinecraft().thePlayer.getEntityId() == playerId) {
             return;
         }
 
         Entity playerToUpd = player.worldObj.getEntityByID(playerId);
-        if(playerToUpd == null || !(playerToUpd instanceof EntityPlayer)) {
+        if (playerToUpd == null || !(playerToUpd instanceof EntityPlayer)) {
             return;
         }
-        ((InventoryPlayerTFC)((EntityPlayer) playerToUpd).inventory).extraEquipInventory[0] = stack;
+        ((InventoryPlayerTFC) ((EntityPlayer) playerToUpd).inventory).extraEquipInventory[0] = stack;
 
-      }
+
+    }
 
     @Override
     public void handleServerSide(EntityPlayer player) {
