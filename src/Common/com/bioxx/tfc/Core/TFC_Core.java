@@ -1433,4 +1433,21 @@ public class TFC_Core
 
 		return world.isRaining() && isExposed;
 	}
+        
+        /**
+         * DEBUG add to F3 overlay info about uploaded chanks count from 
+         * [Client]ChunkDataManager.chunkmap (LongHashMap)
+         * "MultiplayerChunkCashe: n1, n2, n3"
+         * n3 - this number
+         */
+        public static void addChunkCountFromClientChunkDataManager(List<String> list)
+        {
+            if (list == null || list.size() < 4) return;
+            
+            //key = 128 - is ChunkDataManager for Client Side container for chunks
+            ChunkDataManager cdm = cdmMap.get(128);
+            int count = (cdm == null) ? 0 : cdm.getChunkMapNumHashElements();
+            String line4 = list.get(4) + ", " + count;
+            list.set(4, line4);            
+        }
 }

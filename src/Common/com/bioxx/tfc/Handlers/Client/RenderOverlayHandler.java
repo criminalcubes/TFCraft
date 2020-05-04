@@ -366,7 +366,9 @@ public class RenderOverlayHandler
 					TFC_Climate.getHeightAdjustedTemp(mc.theWorld, xCoord, yCoord, zCoord),
 					TFC_Climate.getBioTemperatureHeight(mc.theWorld, xCoord, yCoord, zCoord),
 					evt.floatdata1}));
-
+                        
+                        /*DEBUG*/TFC_Core.addChunkCountFromClientChunkDataManager(event.left);
+                        
 			if(TFCOptions.enableDebugMode)
 			{
 				event.left.add("Stability: " + TFC_Climate.getStability(mc.theWorld, xCoord, zCoord) + 

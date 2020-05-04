@@ -117,4 +117,9 @@ public class ChunkDataManager
 		}
 		return false;
 	}
+        
+        public int getChunkMapNumHashElements() 
+        {
+            return this.chunkmap == null ? 0 : this.chunkmap.getNumHashElements();
+        }
 }
