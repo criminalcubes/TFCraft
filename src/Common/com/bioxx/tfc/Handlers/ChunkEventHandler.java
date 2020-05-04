@@ -18,6 +18,7 @@ import net.minecraftforge.event.world.WorldEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 import com.bioxx.tfc.Chunkdata.ChunkData;
+import com.bioxx.tfc.Chunkdata.ChunkDataManager;
 import com.bioxx.tfc.Core.TFC_Climate;
 import com.bioxx.tfc.Core.TFC_Core;
 import com.bioxx.tfc.Core.TFC_Time;
@@ -90,14 +91,31 @@ public class ChunkEventHandler
 			TFC_Core.getCDM(event.world).addData(chunk, data);
 		}
 	}
-
 	@SubscribeEvent
 	public void onUnload(ChunkEvent.Unload event)
 	{
-		if(TFC_Core.getCDM(event.world) != null && 
-				TFC_Core.getCDM(event.world).getData(event.getChunk().xPosition, event.getChunk().zPosition) != null)
-			TFC_Core.getCDM(event.world).getData(event.getChunk().xPosition, event.getChunk().zPosition).isUnloaded = true;
+            ChunkDataManager cdm = TFC_Core.getCDM(event.world);
+            ChunkData cd = cdm.getData(event.getChunk().xPosition, event.getChunk().zPosition);
+            if(cdm == null || cd == null) 
+                return;
+            if (event.world.isRemote) {
+                //ClientSide - remove now
+                cdm.removeData(event.getChunk().xPosition, event.getChunk().zPosition);
+            }
+            else {
+                //ServerSide mark for remove at onDataSave()
+                cd.isUnloaded = true;                
+            }
 	}
+        
+        //Old for comparison
+//	@SubscribeEvent
+//	public void onUnload(ChunkEvent.Unload event)
+//	{
+//		if(TFC_Core.getCDM(event.world) != null && 
+//				TFC_Core.getCDM(event.world).getData(event.getChunk().xPosition, event.getChunk().zPosition) != null)
+//			TFC_Core.getCDM(event.world).getData(event.getChunk().xPosition, event.getChunk().zPosition).isUnloaded = true;
+//	}
 
 	@SubscribeEvent
 	public void onUnloadWorld(WorldEvent.Unload event)
