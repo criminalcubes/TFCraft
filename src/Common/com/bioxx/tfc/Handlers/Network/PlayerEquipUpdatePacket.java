@@ -1,9 +1,6 @@
 package com.bioxx.tfc.Handlers.Network;
 
 import com.bioxx.tfc.Core.Player.InventoryPlayerTFC;
-import com.bioxx.tfc.Items.ItemBlocks.ItemBarrels;
-import com.bioxx.tfc.api.TFCBlocks;
-import com.bioxx.tfc.api.TFCItems;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import net.minecraft.client.Minecraft;
@@ -14,45 +11,43 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 
 public class PlayerEquipUpdatePacket extends AbstractPacket {
-    private int playerId;
 
-    private ItemStack stack = null;
+    private int playerId;
+    private int itemId;
+    private int itemDamage;
 
 
     public PlayerEquipUpdatePacket() {
     }
 
-    public PlayerEquipUpdatePacket(ItemStack stack, int playerId) {
+    public PlayerEquipUpdatePacket(int playerId, int itemId, int itemDamage) {
         this.playerId = playerId;
-        this.stack = stack;
+        this.itemId = itemId;
+        this.itemDamage = itemDamage;
     }
 
     @Override
     public void encodeInto(ChannelHandlerContext ctx, ByteBuf buffer) {
-
-
         PacketBuffer pb = new PacketBuffer(buffer);
         try {
-            pb.writeItemStackToBuffer(this.stack);
-            pb.writeInt(playerId);
-        } catch (Exception IOException) {
-
+            pb.writeInt(this.playerId);
+            pb.writeInt(this.itemId);
+            pb.writeInt(this.itemDamage);
+        } catch (Exception e) {
+            System.out.println("[TerraFirmaCraft] (ERROR) Error on encode PlayerEquipUpdatePacket: " + e.getMessage());
         }
     }
 
     @Override
     public void decodeInto(ChannelHandlerContext ctx, ByteBuf buffer) {
-
         PacketBuffer pb = new PacketBuffer(buffer);
-
-
         try {
-            this.stack = pb.readItemStackFromBuffer();
             this.playerId = pb.readInt();
-        } catch (Exception IOException) {
-
+            this.itemId = pb.readInt();
+            this.itemDamage = pb.readInt();
+        } catch (Exception e) {
+            System.out.println("[TerraFirmaCraft] (ERROR) Error on decode PlayerEquipUpdatePacket: " + e.getMessage());
         }
-
     }
 
     @Override
@@ -65,9 +60,9 @@ public class PlayerEquipUpdatePacket extends AbstractPacket {
         if (playerToUpd == null || !(playerToUpd instanceof EntityPlayer)) {
             return;
         }
-        ((InventoryPlayerTFC) ((EntityPlayer) playerToUpd).inventory).extraEquipInventory[0] = stack;
 
-
+        ItemStack is = new ItemStack(Item.getItemById(this.itemId), 1,this.itemDamage);
+        ((InventoryPlayerTFC) ((EntityPlayer) playerToUpd).inventory).extraEquipInventory[0] = is;
     }
 
     @Override

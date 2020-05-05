@@ -15,6 +15,7 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.Potion;
@@ -61,7 +62,7 @@ import com.bioxx.tfc.api.Util.Helper;
 
 public class EntityLivingHandler
 {
-	private static HashMap<Integer, Integer> equipMap = new HashMap();
+	private static HashMap<Integer, String> equipMap = new HashMap();
 	@SubscribeEvent
 	public void onEntityLivingUpdate(LivingUpdateEvent event)
 	{
@@ -82,30 +83,54 @@ public class EntityLivingHandler
 
 				/*
 				 * Here barrels of other players packet request.
-				 *
-				 * */
+				 * From AutomatedBellows-Addon,
+				 * @author Sladki
+				 * https://github.com/Sladki/TFC-AutomatedBellows-Addon/blob/385daf9c97939cca564eda6b4ccd3276686255c3/src/java/sladki/tfc/ab/Handlers/PlayerUpdateEventHandler.java
+				 */
+                String prevEquip = equipMap.containsKey(player.getEntityId()) ? equipMap.get(player.getEntityId()) : "-1:0";
+                String currentEquip = "0:0";
 
-				if (MinecraftServer.getServer().getTickCounter() % 120 == 0) {
-					if (player.inventory instanceof InventoryPlayerTFC) {
-						ItemStack[] extraEquipInv = ((InventoryPlayerTFC) player.inventory).extraEquipInventory;
-						if (extraEquipInv[0] == null) {
-							AbstractPacket packet = new PlayerEquipUpdatePacket(null,player.getEntityId());
-							TerraFirmaCraft.PACKET_PIPELINE.sendToAllAround(packet, new TargetPoint(player.dimension, player.posX, player.posY, player.posZ, 64.f));
+                //Check for "new" players
+                if (prevEquip.equals("-1:0")) {
+                    for(Map.Entry<Integer, String> entry : equipMap.entrySet()) {
+                        Entity target = event.entity.worldObj.getEntityByID(entry.getKey());
 
+                        if (target != null && target.dimension == event.entity.dimension && entry.getValue() != null) {
+                            String[] parts = entry.getValue().split(":");
+                            AbstractPacket packet = new PlayerEquipUpdatePacket(entry.getKey(), Integer.parseInt(parts[0]), Integer.parseInt(parts[1]));
+                            TerraFirmaCraft.PACKET_PIPELINE.sendTo(packet, (EntityPlayerMP) player);
+                        }
+                    }
+                }
 
-						}
-						for (ItemStack itemStack : extraEquipInv) {
-							if (itemStack != null /*&& itemStack.getItem() instanceof ItemBarrels*/) {
-								AbstractPacket packet = new PlayerEquipUpdatePacket(new ItemStack(extraEquipInv[0].getItem(),1,extraEquipInv[0].getItemDamage()),player.getEntityId());
-								TerraFirmaCraft.PACKET_PIPELINE.sendToAllAround(packet, new TargetPoint(player.dimension, player.posX, player.posY, player.posZ, 64.f));
-								//currentEquip = itemStack.getItem().getDamage(itemStack);
-								break;
-							}
-						}
+                if (MinecraftServer.getServer().getTickCounter() % 20 == 0) {
 
+                    if (player.inventory instanceof InventoryPlayerTFC) {
+                        ItemStack[] extraEquipInv = ((InventoryPlayerTFC) player.inventory).extraEquipInventory;
 
-					}
-				}
+                        for (ItemStack itemStack : extraEquipInv) {
+                            if (itemStack != null) {
+                                currentEquip = Item.getIdFromItem(itemStack.getItem()) + ":" + itemStack.getItemDamage();
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!prevEquip.equals(currentEquip)) {
+                        equipMap.put(player.getEntityId(), currentEquip);
+
+                        //Do not send information about "new empty" players
+                        if (!prevEquip.equals("-1:0")) {
+                            String[] parts = currentEquip.split(":");
+                            AbstractPacket packet = new PlayerEquipUpdatePacket(player.getEntityId(), Integer.parseInt(parts[0]), Integer.parseInt(parts[1]));
+                            TerraFirmaCraft.PACKET_PIPELINE.sendToDimension(packet, player.dimension);
+                        }
+                    }
+
+                    if(MinecraftServer.getServer().getTickCounter() % 12000 == 0) {
+                        equipMap.clear();
+                    }
+                }
 
 				//Tick Decay
 				TFC_Core.handleItemTicking(player.inventory.mainInventory, player.worldObj, (int)player.posX, (int)player.posY, (int)player.posZ);

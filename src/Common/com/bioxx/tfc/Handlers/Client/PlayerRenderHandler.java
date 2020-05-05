@@ -1,25 +1,19 @@
 package com.bioxx.tfc.Handlers.Client;
 
-import com.bioxx.tfc.Core.TFC_Core;
+import com.bioxx.tfc.Core.Player.InventoryPlayerTFC;
 import com.bioxx.tfc.Items.ItemBlocks.ItemBarrels;
-import com.bioxx.tfc.api.TFCItems;
-import net.minecraft.client.entity.EntityOtherPlayerMP;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-
-import net.minecraftforge.client.event.RenderPlayerEvent.Specials.Pre;
-
+import com.bioxx.tfc.Items.ItemQuiver;
+import com.bioxx.tfc.Render.RenderLargeItem;
+import com.bioxx.tfc.Render.RenderQuiver;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-
-import com.bioxx.tfc.Core.Player.InventoryPlayerTFC;
-import com.bioxx.tfc.Items.ItemQuiver;
-import com.bioxx.tfc.Render.RenderLargeItem;
-import com.bioxx.tfc.Render.RenderQuiver;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.client.event.RenderPlayerEvent.Specials.Pre;
 
 public class PlayerRenderHandler {
 
@@ -36,19 +30,19 @@ public class PlayerRenderHandler {
 				//ItemStack equipables[] = TFC_Core.getBack((EntityPlayer)el);
 				ItemStack[] equipables = ((InventoryPlayerTFC)((EntityPlayer)el).inventory).extraEquipInventory;
 
+				for (ItemStack i : equipables) {
+				    if (i != null && i.getItem() != null) {
+				        if (i.getItem() instanceof ItemQuiver) {
+                            RENDER_QUIVER.render(e.entityLiving, i, e.renderer);
+
+                        } else if (i.getItem() instanceof ItemBarrels) {
+                            RENDER_LARGE.render(e.entityLiving, i, e);
 
 
-
-
-
-				for(ItemStack i : equipables){
-					if(i != null && i.getItem() instanceof ItemQuiver){
-						RENDER_QUIVER.render(e.entityLiving,i,e.renderer);
-					}
-					else if(i != null){
-
-						RENDER_LARGE.render((EntityPlayer)el,i,e);
-					}
+                        } else {
+                            // do nothing (shields renders in another mod)
+                        }
+                    }
 				}
 			}
 		}
