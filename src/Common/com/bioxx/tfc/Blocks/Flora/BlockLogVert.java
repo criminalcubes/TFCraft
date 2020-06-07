@@ -107,5 +107,6 @@ public class BlockLogVert extends BlockTerra
 	@Override
 	public void registerBlockIcons(IIconRegister reg)
 	{
+            this.blockIcon = TFCBlocks.logNatural.getIcon(0, 0);//TFC_Textures.invisibleTexture;
 	}
 }

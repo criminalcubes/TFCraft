@@ -27,4 +27,10 @@
       <task-jvm-args/>
     </task>
   </built-in-tasks>
+  <custom-variables>
+    <var>
+      <name/>
+      <value/>
+    </var>
+  </custom-variables>
 </gradle-project-properties>

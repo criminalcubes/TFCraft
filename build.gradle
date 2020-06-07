@@ -1,9 +1,9 @@
 buildscript {
     repositories {
-		jcenter {
-			url "https://jcenter.bintray.com"
-		}
-		maven {
+        jcenter {
+                url "https://jcenter.bintray.com"
+        }
+        maven {
             name = "maven"
             url = "https://repo1.maven.org/maven2"
         }	
@@ -11,7 +11,7 @@ buildscript {
             name = "Minecraft Forge"
             url = "https://files.minecraftforge.net/maven"
         }
-		 maven {
+        maven {
             name = "sonatype"
             url = "https://oss.sonatype.org/content/repositories/snapshots/"
         }

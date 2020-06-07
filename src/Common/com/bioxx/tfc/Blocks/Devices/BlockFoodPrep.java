@@ -59,6 +59,7 @@ public class BlockFoodPrep extends BlockTerraContainer
 	@Override
 	public void registerBlockIcons(IIconRegister iconRegisterer)
 	{
+            this.blockIcon = TFC_Textures.invisibleTexture;
 	}
 
 	@Override

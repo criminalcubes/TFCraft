@@ -14,6 +14,7 @@ import net.minecraft.world.World;
 
 import net.minecraftforge.common.util.ForgeDirection;
 
+import com.bioxx.tfc.Core.TFC_Textures;
 import com.bioxx.tfc.TileEntities.TEPartial;
 import com.bioxx.tfc.api.TFCBlocks;
 
@@ -33,8 +34,9 @@ public class BlockSlab extends BlockPartial
 	@Override
 	public void registerBlockIcons(IIconRegister iconRegisterer)
 	{
+            this.blockIcon = TFC_Textures.invisibleTexture;
 	}
-
+        
 	@Override
 	public boolean isLadder(IBlockAccess world, int x, int y, int z, EntityLivingBase entity)
 	{

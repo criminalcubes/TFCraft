@@ -29,6 +29,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import com.bioxx.tfc.Core.CollisionRayTraceDetailed;
 import com.bioxx.tfc.Core.Player.PlayerInfo;
 import com.bioxx.tfc.Core.Player.PlayerManagerTFC;
+import com.bioxx.tfc.Core.TFC_Textures;
 import com.bioxx.tfc.Items.Tools.ItemChisel;
 import com.bioxx.tfc.Items.Tools.ItemHammer;
 import com.bioxx.tfc.TileEntities.TEDetailed;
@@ -76,6 +77,7 @@ public class BlockDetailed extends BlockPartial
 	@Override
 	public void registerBlockIcons(IIconRegister iconRegisterer)
 	{
+            this.blockIcon = TFC_Textures.invisibleTexture;
 	}
 
 	@Override

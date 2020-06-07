@@ -25,6 +25,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 import com.bioxx.tfc.TileEntities.TEIngotPile;
+import com.bioxx.tfc.Core.TFC_Textures;
 
 public class BlockIngotPile extends BlockTerraContainer
 {
@@ -38,8 +39,9 @@ public class BlockIngotPile extends BlockTerraContainer
 	@Override
 	public void registerBlockIcons(IIconRegister iconRegisterer)
 	{
+            this.blockIcon = TFC_Textures.invisibleTexture;
 	}
-
+        
 	@Override
 	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer entityplayer, int side, float hitX, float hitY, float hitZ)
 	{

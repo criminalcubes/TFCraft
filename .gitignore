@@ -82,3 +82,14 @@ local.properties
 *Thumbs.db
 .pmd
 /.nb-gradle/
+
+### NetBeans ###
+**/nbproject/private/
+**/nbproject/Makefile-*.mk
+**/nbproject/Package-*.bash
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+.nb-gradle-properties

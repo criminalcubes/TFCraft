@@ -257,6 +257,7 @@ public class BlockStalactite extends BlockTerra
 	@Override
 	public void registerBlockIcons(IIconRegister registerer)
 	{
+            this.blockIcon = TFC_Textures.invisibleTexture;
 	}
 
 	@Override
