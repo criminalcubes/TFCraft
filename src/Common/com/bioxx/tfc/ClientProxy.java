@@ -427,6 +427,8 @@ public class ClientProxy extends CommonProxy
 		KeyBindings.addIsRepeating(false);
 		KeyBindings.addKeyBinding(KeyBindingHandler.keyLockTool);
 		KeyBindings.addIsRepeating(false);
+		KeyBindings.addKeyBinding(KeyBindingHandler.keyDebugScreenMode);//F3
+		KeyBindings.addIsRepeating(false);
 		//ClientRegistry.registerKeyBinding(KeyBindingHandler.Key_ToolMode);
 		//ClientRegistry.registerKeyBinding(KeyBindingHandler.Key_LockTool);
 		uploadKeyBindingsToGame();

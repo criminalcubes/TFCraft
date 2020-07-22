@@ -32,6 +32,7 @@ public class KeyBindingHandler
 	//public static KeyBinding Key_Calendar = new KeyBinding("key.Calendar", Keyboard.KEY_N/*49*/, Reference.ModName);
 	public static KeyBinding keyToolMode = new KeyBinding("key.ToolMode", Keyboard.KEY_M/*50*/, Reference.MOD_NAME);
 	public static KeyBinding keyLockTool = new KeyBinding("key.LockTool", Keyboard.KEY_L/*38*/, Reference.MOD_NAME);
+	public static KeyBinding keyDebugScreenMode = new KeyBinding("key.DebugScreenMode", Keyboard.KEY_P, Reference.MOD_NAME);
 
 	@SubscribeEvent
 	public void onKeyInput(InputEvent.KeyInputEvent event)
@@ -39,10 +40,15 @@ public class KeyBindingHandler
 		PlayerInfo pi = PlayerManagerTFC.getInstance().getClientPlayer();
 		EntityClientPlayerMP player = FMLClientHandler.instance().getClient().thePlayer;
 
-		if(FMLClientHandler.instance().getClient().inGameHasFocus &&
-				FMLClientHandler.instance().getClient().thePlayer.getCurrentEquippedItem() != null &&
-				FMLClientHandler.instance().getClient().currentScreen == null)
-		{
+		if (FMLClientHandler.instance().getClient().inGameHasFocus)
+                {
+                    //change F3 debug screen pattern
+                    if (keyDebugScreenMode.isPressed()) { 
+                        RenderOverlayHandler.debugScreenOutputMode++;
+                    }
+                    else if (FMLClientHandler.instance().getClient().thePlayer.getCurrentEquippedItem() != null &&
+                        FMLClientHandler.instance().getClient().currentScreen == null)
+                    {
 			if(keyToolMode.isPressed())
 			{
 				if(player.getCurrentEquippedItem().getItem() instanceof ItemChisel)
@@ -73,6 +79,7 @@ public class KeyBindingHandler
 					pi.lockZ = -9999999;
 				}
 			}
-		}
+                    }
+                }
 	}
 }

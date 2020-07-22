@@ -45,10 +45,13 @@ import com.bioxx.tfc.api.TFCAttributes;
 import com.bioxx.tfc.api.TFCItems;
 import com.bioxx.tfc.api.TFCOptions;
 import com.bioxx.tfc.api.Tools.ChiselManager;
+import net.minecraft.util.MathHelper;
 
 public class RenderOverlayHandler
 {
 	public static ResourceLocation tfcicons = new ResourceLocation(Reference.MOD_ID, Reference.ASSET_PATH_GUI + "icons.png");
+        /*for select F3 Overlay output view 0 - standart, 1 - short coords, 2 - coords and look rotation*/
+        public static int debugScreenOutputMode = 0 /*STANDART*/;
 	private FontRenderer fontrenderer;
 	public int recordTimer;
 	private final Field _recordPlayingUpFor = ReflectionHelper.findField(GuiIngame.class, "recordPlayingUpFor", "field_73845_h");
@@ -63,10 +66,16 @@ public class RenderOverlayHandler
 		else
 			event.posY -= 12;
 	}
-
+        
 	@SubscribeEvent
 	public void render(RenderGameOverlayEvent.Pre event)
 	{
+                /* Cancels creating standard debug output content(F3) then select other output mode / left and right ArrayList 
+                at GuiIngameForge.renderHUDText() */
+                if ( event.type == ElementType.DEBUG && event.isCancelable() && debugScreenOutputMode != 0) {
+                    event.setCanceled(true);
+                }            
+            
 		GuiIngameForge.renderFood = false;
 
 		// We check for crosshairs just because it's always drawn and is before air bar
@@ -360,12 +369,57 @@ public class RenderOverlayHandler
 			int xCoord = (int)player.posX;
 			int yCoord = (int)player.posY;
 			int zCoord = (int)player.posZ;
-			DataLayer evt = TFC_Climate.getCacheManager(mc.theWorld).getEVTLayerAt(xCoord, zCoord);
-			event.left.add(String.format("rain: %.0f, temp: %.2f, average bio temp: %.2f, evt: %.3f", new Object[] {
-					TFC_Climate.getRainfall(mc.theWorld, xCoord, yCoord, zCoord), 
-					TFC_Climate.getHeightAdjustedTemp(mc.theWorld, xCoord, yCoord, zCoord),
-					TFC_Climate.getBioTemperatureHeight(mc.theWorld, xCoord, yCoord, zCoord),
-					evt.floatdata1}));
+                        
+                        if (debugScreenOutputMode == /*Standart F3 output*/0) {
+                            DataLayer evt = TFC_Climate.getCacheManager(mc.theWorld).getEVTLayerAt(xCoord, zCoord);
+                            event.left.add(String.format("rain: %.0f, temp: %.2f, average bio temp: %.2f, evt: %.3f", new Object[] {
+                                            TFC_Climate.getRainfall(mc.theWorld, xCoord, yCoord, zCoord), 
+                                            TFC_Climate.getHeightAdjustedTemp(mc.theWorld, xCoord, yCoord, zCoord),
+                                            TFC_Climate.getBioTemperatureHeight(mc.theWorld, xCoord, yCoord, zCoord),
+                                            evt.floatdata1}));
+                        }
+                        /* New way to output debug infos with playerCoords. It select by KeyBindingHandler.keyDebugScreenMode
+                           Replaced standart data to short view. Before that the creation of left and right
+                           list was cancaled and they are empty now  */
+                        else if (debugScreenOutputMode == 1 || debugScreenOutputMode == 2) {
+                            event.left.clear();                            
+                            int heading = MathHelper.floor_double((double)(mc.thePlayer.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3; 
+                            char direction = 'S';
+                            switch (heading) {
+                                case 0: direction = 'S'; break;
+                                case 1: direction = 'W'; break;
+                                case 2: direction = 'N'; break;
+                                case 3: direction = 'E'; break;                                
+                                default: direction = '?';
+                            }
+                                                         //   x    y    z
+                            String coords = String.format("[%.1f %.1f %.1f] ",
+                                    mc.thePlayer.posX, 
+                                    mc.thePlayer.posY, 
+                                    mc.thePlayer.posZ);
+                            //player look rotation
+                            if (debugScreenOutputMode >= 2) {
+                                String rotation = String.format("%.0f %.0f",
+                                    MathHelper.wrapAngleTo180_float(player.rotationYaw),
+                                    MathHelper.wrapAngleTo180_float(player.rotationPitch));
+                                coords += rotation;
+                            }
+                            event.left.add(coords);
+                            
+                            if (mc.theWorld != null && mc.theWorld.blockExists(xCoord, yCoord, zCoord))
+                            {
+                                net.minecraft.world.chunk.Chunk chunk = mc.theWorld.getChunkFromBlockCoords(xCoord, zCoord);
+                                StringBuilder sb = new StringBuilder();
+                                sb.append(direction)
+                                  .append( player.onGround ? '_' : '^')
+                                  .append(chunk.getBiomeGenForWorldCoords(xCoord & 15, zCoord & 15, mc.theWorld.getWorldChunkManager() ).biomeName);
+                                event.left.add(sb.toString());
+                            }
+                        } 
+                        //back to standart debugScreen output
+                        else {
+                            debugScreenOutputMode = 0;
+                        }
                         
                         /*DEBUG*/TFC_Core.addChunkCountFromClientChunkDataManager(event.left);
                         

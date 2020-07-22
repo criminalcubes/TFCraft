@@ -246,7 +246,7 @@ public class TerraFirmaCraft
 		evt.registerServerCommand(new PrintImageMapCommand());
 		evt.registerServerCommand(new GiveSkillCommand());
 		evt.registerServerCommand(new CommandTransferTamed());
-        evt.registerServerCommand(new DiscordCommand());
+                evt.registerServerCommand(new DiscordCommand());
 	}
 
 	@SubscribeEvent
