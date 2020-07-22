@@ -171,4 +171,27 @@ public class Helper {
 		}
 		return null; 		
 	}
+        
+        public static String intsToString(int[] a, char sep) {
+            if (a == null || a.length == 0) return "[]";
+            StringBuilder sb = new StringBuilder("[");
+            for (int i = 0; i < a.length; i++) {
+                if (i>0) sb.append(sep);
+                sb.append(a[i]);
+            }
+            return sb.append(']').toString();
+        }
+
+        public static String intsToString(int[] a) {
+            return intsToString(a, ' ');
+        }
+
+        public static int getSum(int[] a) {
+            if (a==null || a.length==0) return 0;
+            int sum = 0;
+            for (int i = 0; i < a.length; i++) {
+                sum += a[i];
+            }
+            return sum;
+        }
 }

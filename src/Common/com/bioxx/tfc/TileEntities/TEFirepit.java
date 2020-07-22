@@ -58,13 +58,14 @@ public class TEFirepit extends TEFireEntity implements IInventory
 
 	public void cookItem()
 	{
-		HeatRegistry manager = HeatRegistry.getInstance();
-		Random r = new Random();
 		if(fireItemStacks[1] != null)
 		{
+                        HeatRegistry manager = HeatRegistry.getInstance();
+                        
 			HeatIndex index = manager.findMatchingIndex(fireItemStacks[1]);
 			if(index != null && TFC_ItemHeat.getTemp(fireItemStacks[1]) > index.meltTemp)
 			{
+                                Random r = worldObj.rand;//new Random(); net.minecraft.world.Word.rand = new Random();
 				ItemStack output = index.getOutput(fireItemStacks[1], r);
 				ItemCookEvent eventMelt = new ItemCookEvent(fireItemStacks[1], output, this);
 				MinecraftForge.EVENT_BUS.post(eventMelt);
@@ -255,7 +256,7 @@ public class TEFirepit extends TEFireEntity implements IInventory
 	{
 		float f3 = 0.05F;
 		EntityItem entityitem;
-		Random rand = new Random();
+		Random rand = worldObj.rand;//new Random(); net.minecraft.world.Word.rand = new Random();
 		float f = rand.nextFloat() * 0.8F + 0.1F;
 		float f1 = rand.nextFloat() * 0.8F + 0.3F;
 		float f2 = rand.nextFloat() * 0.8F + 0.1F;
@@ -365,21 +366,13 @@ public class TEFirepit extends TEFireEntity implements IInventory
 				float temp = TFC_ItemHeat.getTemp(is);
 				if (fuelTimeLeft > 0 && is.getItem() instanceof ICookableFood)
 				{
-					float inc = Food.getCooked(is) + Math.min(fireTemp / 700, 2f);
+                                        float lastCookedTemp = Food.getCooked(is);
+					float inc = lastCookedTemp + Math.min(fireTemp / 700, 2f);
 					Food.setCooked(is, inc);
 					temp = inc;
 					if (Food.isCooked(is))
 					{
-						int[] cookedTasteProfile = new int[]
-						{ 0, 0, 0, 0, 0 };
-						Random r = new Random(((ICookableFood) is.getItem()).getFoodID() + (((int) Food.getCooked(is) - 600) / 120));
-						cookedTasteProfile[0] = r.nextInt(31) - 15;
-						cookedTasteProfile[1] = r.nextInt(31) - 15;
-						cookedTasteProfile[2] = r.nextInt(31) - 15;
-						cookedTasteProfile[3] = r.nextInt(31) - 15;
-						cookedTasteProfile[4] = r.nextInt(31) - 15;
-						Food.setCookedProfile(is, cookedTasteProfile);
-						Food.setFuelProfile(is, EnumFuelMaterial.getFuelProfile(fuelTasteProfile));
+                                            Food.updatedCookedTasteProfile(is, lastCookedTemp, temp, fuelTasteProfile);
 					}
 				}
 				else if (fireTemp > temp && index.hasOutput())
@@ -398,8 +391,13 @@ public class TEFirepit extends TEFireEntity implements IInventory
 	{
 		if(!worldObj.isRemote)
 		{
+                        boolean hasItemsToTick = hasItemsToTick();
+                        int meta = worldObj.getBlockMetadata(xCoord, yCoord, zCoord);// >= 1 work
 			// Create a list of all the items that are falling onto the firepit
-			List list = worldObj.getEntitiesWithinAABB(EntityItem.class, AxisAlignedBB.getBoundingBox(xCoord, yCoord, zCoord, xCoord + 1, yCoord + 1.1, zCoord + 1));
+			List list = meta > 0 
+                                //only then firepit is burning
+                                ? worldObj.getEntitiesWithinAABB(EntityItem.class, AxisAlignedBB.getBoundingBox(xCoord, yCoord, zCoord, xCoord + 1, yCoord + 1.1, zCoord + 1))
+                                : null;
 
 			if (list != null && !list.isEmpty() && fireItemStacks[0] == null) // Only go through the list if more fuel can fit.
 			{
@@ -431,19 +429,17 @@ public class TEFirepit extends TEFireEntity implements IInventory
 					}
 				}
 			}
-
-			//Here we take care of the item that we are cooking in the fire
-			careForInventorySlot(fireItemStacks[1]);
-			careForInventorySlot(fireItemStacks[7]);
-			careForInventorySlot(fireItemStacks[8]);
-
+                        if (hasItemsToTick) {
+                            //Here we take care of the item that we are cooking in the fire
+                            careForInventorySlot(fireItemStacks[1]);
+                            careForInventorySlot(fireItemStacks[7]);
+                            careForInventorySlot(fireItemStacks[8]);
+                            /*hasCookingPot = fireItemStacks[1] != null &&fireItemStacks[1].getItem() == TFCItems.PotteryPot &&
+                                                            fireItemStacks[1].getItemDamage() == 1;*/
+                            //Now we cook the input item
+                            cookItem();
+                        }
 			smokeFoods();
-
-			/*hasCookingPot = fireItemStacks[1] != null &&fireItemStacks[1].getItem() == TFCItems.PotteryPot &&
-							fireItemStacks[1].getItemDamage() == 1;*/
-
-			//Now we cook the input item
-			cookItem();
 
 			//push the input fuel down the stack
 			handleFuelStack();
@@ -502,10 +498,19 @@ public class TEFirepit extends TEFireEntity implements IInventory
 					fireItemStacks[8].stackSize = 1;
 			}
 
-			if(fuelTimeLeft <= 0)
+			if(fuelTimeLeft <= 0 && hasItemsToTick)
 				TFC_Core.handleItemTicking(this, worldObj, xCoord, yCoord, zCoord);
 		}
 	}
+        /**
+         * has items for tick, is input and output 1 & 2 slot
+         * Fuel is not included here
+         */
+        private boolean hasItemsToTick() {
+            return this.fireItemStacks.length > 8 && (
+                   this.fireItemStacks[1] != null || //input
+                   this.fireItemStacks[7] != null || this.fireItemStacks[8] != null);//output 1 & 2 
+        }
 
 	private void smokeFoods() 
 	{

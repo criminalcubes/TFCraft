@@ -1417,6 +1417,9 @@ public class TFC_Core
 	
 	public static boolean isExposedToRain(World world, int x, int y, int z)
 	{
+                if (!world.isRaining()) {
+                    return false;
+                }
 		int highestY = world.getPrecipitationHeight(x, z) - 1;
 		boolean isExposed = true;
 		if (world.canBlockSeeTheSky(x, y + 1, z)) // Either no blocks, or transparent blocks above.
@@ -1431,7 +1434,7 @@ public class TFC_Core
 		else // Can't see the sky
 			isExposed = false;
 
-		return world.isRaining() && isExposed;
+		return isExposed;//return world.isRaining() && isExposed;
 	}
         
         /**

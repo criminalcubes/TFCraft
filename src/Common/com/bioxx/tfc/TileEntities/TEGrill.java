@@ -28,16 +28,25 @@ public class TEGrill extends NetworkTileEntity implements IInventory
 {
 	public ItemStack[] storage = new ItemStack[6];
 	public byte data;
+        
+        private boolean isEmptyInventory() {
+            return this.storage[0] == null && this.storage[1] == null && this.storage[2] == null && 
+                   this.storage[3] == null && this.storage[4] == null && this.storage[5] == null;
+        }
 
 	@Override
 	public void updateEntity()
 	{
-		TFC_Core.handleItemTicking(this, worldObj, xCoord, yCoord, zCoord);
+                if (isEmptyInventory()) return;
+                
+                TFC_Core.handleItemTicking(this, worldObj, xCoord, yCoord, zCoord);
 		//boolean oven = isOven();
+                TileEntity te = worldObj.getTileEntity(xCoord, yCoord-1, zCoord);
+                if (!(te instanceof TEFireEntity)) return;
 		for (int i = 0; i < 6; i++)
 		{
-			careForInventorySlot(storage[i]);
-			cookItem(i);
+                        //CookItem inside here
+			careForInventorySlot(te, i);
 		}
 	}
 
@@ -97,10 +106,11 @@ public class TEGrill extends NetworkTileEntity implements IInventory
 		return false;
 	}
 
-	public void careForInventorySlot(ItemStack is)
+        public void careForInventorySlot(TileEntity te, /*ItemStack is*/int i)
 	{
-		TileEntity te = worldObj.getTileEntity(xCoord, yCoord-1, zCoord);
-		if(is != null && te instanceof TEFireEntity)
+		//TileEntity te = worldObj.getTileEntity(xCoord, yCoord-1, zCoord);
+                ItemStack is = storage[i];
+		if(is != null)// && te instanceof TEFireEntity)
 		{
 			HeatRegistry manager = HeatRegistry.getInstance();
 			HeatIndex index = manager.findMatchingIndex(is);
@@ -111,9 +121,15 @@ public class TEGrill extends NetworkTileEntity implements IInventory
 				TEFireEntity fire = (TEFireEntity) te;
 				if (fire.fuelTimeLeft > 0 && is.getItem() instanceof IFood)
 				{
-					float inc = Food.getCooked(is) + Math.min(fire.fireTemp / 700, 2f);
+					float lastCookedTemp = Food.getCooked(is);
+                                        float inc = lastCookedTemp + Math.min(fire.fireTemp / 700, 2f);
 					Food.setCooked(is, inc);
 					temp = inc;
+                                        if (Food.isCooked(is)) //temp > index.meltTemp
+					{
+                                            //update and change cooked and fuel profile only if need (then changed foodSeed)
+                                            Food.updatedCookedTasteProfile(is, lastCookedTemp, temp, fire.fuelTasteProfile);
+					}
 				}
 				else if (fire.fireTemp > temp)
 				{
@@ -125,55 +141,31 @@ public class TEGrill extends NetworkTileEntity implements IInventory
 				else
 					temp -= TFC_ItemHeat.getTempDecrease(is);
 				TFC_ItemHeat.setTemp(is, temp);
+                                
+                                //---  COOK ITEM  ---
+                                if (temp > index.meltTemp) {
+                                    cookItem(i, index, temp);
+                                }
 			}
 		}
 	}
+        public void cookItem(int i, HeatIndex index, float temp) {
+                //float temp = TFC_ItemHeat.getTemp(storage[i]);
+                Random r = worldObj.rand;//new Random(); net.minecraft.world.Word.rand = new Random();
+                ItemStack output = index.getOutput(storage[i], r);
 
-	public void cookItem(int i)
-	{
-		HeatRegistry manager = HeatRegistry.getInstance();
-		Random r = new Random();
-		if(storage[i] != null)
-		{
-			HeatIndex index = manager.findMatchingIndex(storage[i]);
-			if(index != null && Food.isCooked(storage[i]))
-			{
-				//int[] fuelTasteProfile = new int[] {0,0,0,0,0};
-				int[] cookedTasteProfile = new int[] {0,0,0,0,0};
-				r = new Random(((ICookableFood)storage[i].getItem()).getFoodID()+(((int)Food.getCooked(storage[i])-600)/120));
-				cookedTasteProfile[0] = r.nextInt(31) - 15;
-				cookedTasteProfile[1] = r.nextInt(31) - 15;
-				cookedTasteProfile[2] = r.nextInt(31) - 15;
-				cookedTasteProfile[3] = r.nextInt(31) - 15;
-				cookedTasteProfile[4] = r.nextInt(31) - 15;
-				Food.setCookedProfile(storage[i], cookedTasteProfile);
-				TileEntity te = worldObj.getTileEntity(xCoord, yCoord-1, zCoord);
-				if(te instanceof TEFireEntity)
-				{
-					TEFireEntity fire = (TEFireEntity) te;
-					Food.setFuelProfile(storage[i], EnumFuelMaterial.getFuelProfile(fire.fuelTasteProfile));
-				}
-			}
+                ItemCookEvent eventMelt = new ItemCookEvent(storage[i], output, this);
+                MinecraftForge.EVENT_BUS.post(eventMelt);
+                output = eventMelt.result;		
 
-			if(index != null && TFC_ItemHeat.getTemp(storage[i]) > index.meltTemp)
-			{
-				float temp = TFC_ItemHeat.getTemp(storage[i]);
-				ItemStack output = index.getOutput(storage[i], r);
-
-				ItemCookEvent eventMelt = new ItemCookEvent(storage[i], output, this);
-				MinecraftForge.EVENT_BUS.post(eventMelt);
-				output = eventMelt.result;		
-
-				//Morph the input
-				storage[i] = output;
-				if(storage[i] != null && manager.findMatchingIndex(storage[i]) != null)
-				{
-					//if the input is a new item, then apply the old temperature to it
-					TFC_ItemHeat.setTemp(storage[i], temp);
-				}
-			}
-		}
-	}
+                //Morph the input
+                storage[i] = output;
+                if(storage[i] != null && HeatRegistry.getInstance().findMatchingIndex(storage[i]) != null)
+                {
+                        //if the input is a new item, then apply the old temperature to it
+                        TFC_ItemHeat.setTemp(storage[i], temp);
+                }            
+        }
 
 	public int getSide()
 	{

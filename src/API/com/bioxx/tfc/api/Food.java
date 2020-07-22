@@ -2,12 +2,14 @@ package com.bioxx.tfc.api;
 
 import java.util.Random;
 
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
 import com.bioxx.tfc.TerraFirmaCraft;
 import com.bioxx.tfc.Core.TFC_Core;
 import com.bioxx.tfc.Core.TFC_Time;
+import com.bioxx.tfc.api.Enums.EnumFuelMaterial;
 import com.bioxx.tfc.api.Interfaces.IFood;
 import com.bioxx.tfc.api.Util.Helper;
 
@@ -36,6 +38,7 @@ public class Food
 	public static final String FOOD_GROUP_TAG = "FG";
 	public static final int DRYHOURS = 4;
 	public static final int SMOKEHOURS = 12;
+        public static final int[] EMPTY_TASTE_PROFILE = new int[] {0, 0, 0, 0, 0};
 
 	private static NBTTagCompound getProcTag(ItemStack is)
 	{
@@ -134,13 +137,74 @@ public class Food
 		else
 			return 0.0F;
 	}
-
+        
 	public static void setCooked(ItemStack is, float value)
 	{
 		NBTTagCompound nbt = getProcTag(is);
 		nbt.setFloat(COOKED_TAG, value);
 		setProcTag(is, nbt);
 	}
+        
+        /**
+         * 600 temp is Cooked Food
+         * <600  -1 - not Cooked
+         * >600   0
+         * >720   1
+         * >840   2
+         * @param is
+         * @return 
+         */
+        public static int getCookedTempLevel(ItemStack is) {            
+            return getCookedTempLevel(Food.getCooked(is));
+        }
+        /**
+         * @param cookedTemp
+         * @return -1 not Cooked 
+         */
+        public static int getCookedTempLevel(float cookedTemp) {
+            return cookedTemp < 600F ? -1 : (((int) cookedTemp - 600) / 120);
+        }
+        /**
+         * Used at CookItem(firepit | grill) for gen CookedTasteProfile only then CookedTemp > 600 (isCooked)
+         * @param is
+         * @return 0 - is not Cooked Item, can`t create Seed for CookedTasteProfile gen
+         */
+        public static int getCookedSeed(ItemStack is) {
+            if (is == null) return 0;
+            int cookedLvl = getCookedTempLevel(is);
+            if (cookedLvl < 0)//not Cooked flag is not seed
+                return 0;
+            Item item = is.getItem();
+            return (item instanceof IFood) ?  (((IFood) item).getFoodID() + cookedLvl) : 0;
+        }
+        /**
+         * 
+         * @param is Food
+         * @param lastCookedTemp
+         * @param nowCookedTemp
+         * @param fuelTasteProfile 
+         */
+        public static void updatedCookedTasteProfile(ItemStack is, float lastCookedTemp, float nowCookedTemp, int fuelTasteProfile) {
+            int foodID = ((IFood) is.getItem()).getFoodID();
+            long lSeed = foodID + getCookedTempLevel(lastCookedTemp);
+            long nSeed = foodID + getCookedTempLevel(nowCookedTemp);
+            
+            if (nSeed != lSeed || !Food.hasCookedProfile(is)) {
+                Random r = new Random(nSeed);//new Random(((ICookableFood) is.getItem()).getFoodID() + (((int) Food.getCooked(is) - 600) / 120));
+                int[] cookedTasteProfile = new int[] {0, 0, 0, 0, 0};
+                cookedTasteProfile[0] = r.nextInt(31) - 15;
+                cookedTasteProfile[1] = r.nextInt(31) - 15;
+                cookedTasteProfile[2] = r.nextInt(31) - 15;
+                cookedTasteProfile[3] = r.nextInt(31) - 15;
+                cookedTasteProfile[4] = r.nextInt(31) - 15;
+                Food.setCookedProfile(is, cookedTasteProfile);
+                Food.setFuelProfile(is, EnumFuelMaterial.getFuelProfile(fuelTasteProfile));
+            }
+        }
+        public static boolean hasCookedProfile(ItemStack is) {
+            NBTTagCompound nbt = getProcTag(is);
+            return (nbt.hasKey(COOKED_PROFILE_TAG));
+        }
 
 	public static int[] getCookedProfile(ItemStack is)
 	{
@@ -148,7 +212,7 @@ public class Food
 		if (nbt.hasKey(COOKED_PROFILE_TAG))
 			return nbt.getIntArray(COOKED_PROFILE_TAG);
 		else
-			return new int[] {0,0,0,0,0};
+			return Food.EMPTY_TASTE_PROFILE;
 	}
 
 	public static void setCookedProfile(ItemStack is, int[] value)
@@ -157,14 +221,13 @@ public class Food
 		nbt.setIntArray(COOKED_PROFILE_TAG, value);
 		setProcTag(is, nbt);
 	}
-
 	public static int[] getFuelProfile(ItemStack is)
 	{
 		NBTTagCompound nbt = getProcTag(is);
 		if (nbt.hasKey(FUEL_PROFILE_TAG))
 			return nbt.getIntArray(FUEL_PROFILE_TAG);
 		else
-			return new int[] {0,0,0,0,0};
+			return EnumFuelMaterial.EMPTY_FUEL_PROFILE;
 	}
 
 	public static void setFuelProfile(ItemStack is, int[] value)
@@ -177,8 +240,11 @@ public class Food
 	public static boolean isSmoked(ItemStack is)
 	{
 		NBTTagCompound nbt = getProcTag(is);
-		return nbt.hasKey(FUEL_PROFILE_TAG) && !isSameSmoked(getFuelProfile(is), new int[]
-		{ 0, 0, 0, 0, 0 });
+		return nbt.hasKey(FUEL_PROFILE_TAG) && !isEmptySmoked(getFuelProfile(is));//!isSameSmoked(getFuelProfile(is), new int[] { 0, 0, 0, 0, 0 });
+	}
+	public static boolean isEmptySmoked(int[] f1)
+	{
+		return f1[0] == 0 && f1[1] == 0 && f1[2] == 0 && f1[3] == 0 && f1[4] == 0;
 	}
 
 	public static boolean isSameSmoked(ItemStack is1, ItemStack is2)

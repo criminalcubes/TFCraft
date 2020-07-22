@@ -26,6 +26,7 @@ public enum EnumFuelMaterial
 	public final int burnTimeMax;
 	public final int burnTempMax;//degrees celcius
 	public final int[] tasteProfile;
+        public static final int[] EMPTY_FUEL_PROFILE = new int[] {0,0,0,0,0};
 
 	private EnumFuelMaterial(String s, int i, int j, int[] taste)
 	{
@@ -37,7 +38,7 @@ public enum EnumFuelMaterial
 	public static int[] getFuelProfile(int ordinal)
 	{
 		if(ordinal < 0 || ordinal > values().length)
-			return new int[] {0,0,0,0,0};
+			return EMPTY_FUEL_PROFILE;//new int[] {0,0,0,0,0};
 		return values()[ordinal].tasteProfile;
 	}
 }

@@ -18,8 +18,10 @@ import com.bioxx.tfc.Items.Tools.ItemKnife;
 import com.bioxx.tfc.api.Food;
 import com.bioxx.tfc.api.TFCItems;
 import com.bioxx.tfc.api.Constant.Global;
+import com.bioxx.tfc.api.Enums.EnumFuelMaterial;
 import com.bioxx.tfc.api.Events.ItemCookEvent;
 import com.bioxx.tfc.api.Interfaces.IFood;
+import com.bioxx.tfc.api.TFC_ItemHeat;
 import com.bioxx.tfc.api.Util.Helper;
 
 public class FoodCraftingHandler
@@ -109,12 +111,21 @@ public class FoodCraftingHandler
 	{
 		float finalWeight = 0;
 		float finalDecay = 0;
-		int[] fuelTasteProfile = new int[] {0,0,0,0,0};
-		int[] cookedTasteProfile = new int[] {0,0,0,0,0};
+		int[] fuelTasteProfile = EnumFuelMaterial.EMPTY_FUEL_PROFILE;// = new int[] {0,0,0,0,0};
+		int[] cookedTasteProfile = Food.EMPTY_TASTE_PROFILE;// = new int[] {0,0,0,0,0};
 		float cookedTime = 0;
 		int foodCount = 0;
 		int itemCount = 0;
 		int foodSlot = 0; //This is used when cutting food to track where the food originally was since the merge code may remove the stack
+                
+                String infusion = null;
+		boolean salted = true;
+		boolean pickled = true;
+		boolean brined = true;
+                int smokeCounter = 0;
+                int driedAmt = 0;//boolean dried = true;
+                float temp = 0;
+                
 		for(int i = 0; i < craftingInv.getSizeInventory(); i++)
 		{
 			ItemStack is = craftingInv.getStackInSlot(i);
@@ -124,11 +135,18 @@ public class FoodCraftingHandler
 			if (is.getItem() instanceof ItemFoodTFC && is.hasTagCompound() && is.getTagCompound().hasKey(Food.WEIGHT_TAG))
 			{
 				foodSlot = i;
-				if(foodCount == 0)
+				if (foodCount == 0)
 				{
 					fuelTasteProfile = Food.getFuelProfile(is);
 					cookedTasteProfile = Food.getCookedProfile(is);
 					cookedTime = Food.getCooked(is);
+                                        salted = Food.isSalted(is);
+                                        pickled = Food.isPickled(is);
+                                        brined = Food.isBrined(is);
+                                        driedAmt = Food.getDried(is);//dried = Food.isDried(is);
+                                        infusion = Food.getInfusion(is);
+                                        smokeCounter = Food.getSmokeCounter(is);
+                                        temp = TFC_ItemHeat.getTemp(is);
 				}
 
 				float inputWeight = Food.getWeight(is);
@@ -139,10 +157,19 @@ public class FoodCraftingHandler
 
 				// If the smoked or cooked profile is not the same than we can't combine
 				// Check if we can add any more to this bundle of food
+                                // Additional not combine others food stats
 				if (finalWeight < Global.FOOD_MAX_WEIGHT &&
 						Food.isSameSmoked(cookedTasteProfile, Food.getCookedProfile(is)) &&
 						Food.isSameSmoked(fuelTasteProfile, Food.getFuelProfile(is)) &&
-						((int) Food.getCooked(is) - 600) / 120 == ((int) cookedTime - 600) / 120)
+						((int) cookedTime - 600) / 120 == ((int) Food.getCooked(is) - 600) / 120  &&
+                                                salted == Food.isSalted(is) &&
+                                                pickled == Food.isPickled(is) &&
+                                                brined == Food.isBrined(is) &&
+                                                driedAmt == Food.getDried(is) &&//dried == Food.isDried(is) &&
+                                                infusion == Food.getInfusion(is) &&                                                
+                                                smokeCounter == Food.getSmokeCounter(is) &&
+                                                temp == TFC_ItemHeat.getTemp(is)
+                                        )
 				{
 					weightChange = Math.min((Global.FOOD_MAX_WEIGHT - finalWeight), inputWeight);
 					inputWeight -= weightChange;
@@ -276,17 +303,20 @@ public class FoodCraftingHandler
 		int saltyMod = -1;
 		int bitterMod = -1;
 		int umamiMod = -1;
-		int[] fuelTasteProfile = new int[] { 0, 0, 0, 0, 0 };
-		int[] cookedTasteProfile = new int[] { 0, 0, 0, 0, 0 };
-		float cookedTime = 0;
+		int[] fuelTasteProfile = EnumFuelMaterial.EMPTY_FUEL_PROFILE;// = new int[] {0,0,0,0,0};
+		int[] cookedTasteProfile = Food.EMPTY_TASTE_PROFILE;// = new int[] {0,0,0,0,0};
+		float cookedTime = 0;                
 		String infusion = null;
 		boolean salted = true;
 		boolean pickled = true;
 		boolean brined = true;
-		boolean dried = true;
-		int driedAmt = 0;
+                //Do not use "dried" any more because in any case need a driedAmt value 
+		//boolean dried = true;// nbt.hasKey(DRIED_TAG) && nbt.getShort(DRIED_TAG) >= DRYHOURS;
+		int driedAmt = 0;      // nbt.getShort(DRIED_TAG);
+                int smokeCounter = 0;
 		int foodCount = 0;
 		int itemCount = 0;
+                float temp = 0;
 		for (int i = 0; i < craftingInv.getSizeInventory(); i++ )
 		{
 			if (craftingInv.getStackInSlot(i) == null)
@@ -301,8 +331,13 @@ public class FoodCraftingHandler
 					cookedTasteProfile = Food.getCookedProfile(is);
 					cookedTime = Food.getCooked(is);
 					infusion = Food.getInfusion(is);
-					driedAmt = Food.getDried(is);
-				}
+                                        salted = Food.isSalted(is);
+                                        pickled = Food.isPickled(is);
+                                        brined = Food.isBrined(is);
+                                        driedAmt = Food.getDried(is);//dried = Food.isDried(is);
+                                        smokeCounter = Food.getSmokeCounter(is);
+                                        temp = TFC_ItemHeat.getTemp(is);
+				} 
 				if (sweetMod == -1)
 					sweetMod = Food.getSweetMod(is);
 				else if (sweetMod != Food.getSweetMod(is))
@@ -334,17 +369,21 @@ public class FoodCraftingHandler
 				float inputDecay = Food.getDecay(is);
 				float weightChange = 0;
 
-				salted = salted && Food.isSalted(is);
-				pickled = pickled && Food.isPickled(is);
-				brined = brined && Food.isBrined(is);
-				dried = dried && Food.isDried(is);
-
 				// If the smoked or cooked profile is not the same than we can't combine
 				// Check if we can add any more to this bundle of food
+                                //Additional not combine another food stats: salted pickled dried smoke infusion
 				if (finalWeight < Global.FOOD_MAX_WEIGHT &&
 						Food.isSameSmoked(cookedTasteProfile, Food.getCookedProfile(is)) &&
 						Food.isSameSmoked(fuelTasteProfile, Food.getFuelProfile(is)) &&
-						((int) Food.getCooked(is) - 600) / 120 == ((int) cookedTime - 600) / 120)
+						((int) cookedTime - 600) / 120  ==  ((int) Food.getCooked(is) - 600) / 120 &&
+                                                salted == Food.isSalted(is) &&
+                                                pickled == Food.isPickled(is) &&
+                                                brined == Food.isBrined(is) &&                                                
+                                                driedAmt == Food.getDried(is) &&//dried == Food.isDried(is)
+                                                infusion == Food.getInfusion(is) &&
+                                                smokeCounter == Food.getSmokeCounter(is) &&
+                                                temp == TFC_ItemHeat.getTemp(is)
+                                   )
 				{
 					weightChange = Math.min((Global.FOOD_MAX_WEIGHT - finalWeight), inputWeight);
 					inputWeight -= weightChange;
@@ -479,13 +518,22 @@ public class FoodCraftingHandler
 		if (brined)
 			Food.setBrined(craftResult, brined);
 
-		if (dried) // Fully Dried
-			Food.setDried(craftResult, Food.DRYHOURS);
-		else if (driedAmt > 0) // Partially Dried
-			Food.setDried(craftResult, driedAmt);
+                //not use dried any more
+		/*if (dried) // Fully Dried Food.setDried(craftResult, Food.DRYHOURS); else // Partially Dried */
+                if (driedAmt > 0) 
+                {        if (driedAmt > Food.DRYHOURS) {
+                            //not to overflow
+                            driedAmt = Food.DRYHOURS;
+                        }
+			Food.setDried(craftResult, driedAmt );
+                }
 
 		if (infusion != null)
 			Food.setInfusion(craftResult, infusion);
+                if (smokeCounter > 0)
+                        Food.setSmokeCounter(craftResult, smokeCounter);
+		if (temp > 0)
+			TFC_ItemHeat.setTemp(craftResult, temp);
 
 		if (craftResult.stackSize == 0)
 			craftResult.stackSize = 1;

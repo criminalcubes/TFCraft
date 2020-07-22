@@ -27,9 +27,15 @@ public class TESmokeRack extends NetworkTileEntity implements IInventory
 	{
 	}
 
+        private boolean isEmptyInventory() {
+            return this.storage[0] == null && this.storage[1] == null;
+        }
+
 	@Override
 	public void updateEntity()
 	{
+                if (isEmptyInventory()) return;
+                
 		float env = 1.0f;
 		float base = 1.0f;
 
@@ -37,15 +43,19 @@ public class TESmokeRack extends NetworkTileEntity implements IInventory
 		{
 			env = 0.75f; base = 0.75f;
 		}
+                
+                boolean isExposedToRain = TFC_Core.isExposedToRain(worldObj, xCoord, yCoord, zCoord);
+                //cannot dry on rain
+                if (!isExposedToRain) {
+                    this.dryTimer++;
+                    if (dryTimer > 1000)
+                    {
+                            dryTimer = 0;
+                            dryFoods();
+                    }
+                }
 
-		this.dryTimer++;
-		if (dryTimer > 1000)
-		{
-			dryTimer = 0;
-			dryFoods();
-		}
-
-		if (!TFC_Core.isExposedToRain(worldObj, xCoord, yCoord, zCoord) && TFC_Time.getTotalHours() > this.lastSmokedTime + 1)
+		if (!isExposedToRain && TFC_Time.getTotalHours() > this.lastSmokedTime + 1)
 			TFC_Core.handleItemTicking(this, worldObj, xCoord, yCoord, zCoord, env, base);
 		else if(TFC_Climate.getHeightAdjustedTemp(worldObj, xCoord, yCoord, zCoord) > 0)
 			TFC_Core.handleItemTicking(this, worldObj, xCoord, yCoord, zCoord, env*2, base*2);
@@ -128,7 +138,9 @@ public class TESmokeRack extends NetworkTileEntity implements IInventory
 	public ItemStack removeStackInSlot(int i)
 	{
 		ItemStack is = this.getStackInSlot(i).copy();
-		Food.setDried(is, (int)TFC_Time.getTotalHours()-this.driedCounter[i]);
+                int driedAmt = (int) TFC_Time.getTotalHours() - this.driedCounter[i];
+                if (driedAmt > Food.DRYHOURS) driedAmt = Food.DRYHOURS;
+		Food.setDried(is, driedAmt);
 		this.setInventorySlotContents(i, null);
 		return is;
 	}
@@ -140,10 +152,17 @@ public class TESmokeRack extends NetworkTileEntity implements IInventory
 			if (getStackInSlot(i) != null)
 			{
 				ItemStack is = getStackInSlot(i);
-				Food.setDried(is, (int) TFC_Time.getTotalHours() - this.driedCounter[i]);
-				driedCounter[i] = (int) (TFC_Time.getTotalHours() - Food.getDried(is));
+                                int driedAmt = Food.DRYHOURS;
+                                if (!Food.isDried(is)) {
+                                    driedAmt = (int) TFC_Time.getTotalHours() - this.driedCounter[i];
+                                    //not to overflow
+                                    if (driedAmt > Food.DRYHOURS) 
+                                        driedAmt = Food.DRYHOURS;
+                                    Food.setDried(is, driedAmt);
+                                }
+                                //used then item remove from smokeRack
+				driedCounter[i] = (int) (TFC_Time.getTotalHours() - driedAmt);//Food.getDried(is));
 			}
-
 		}
 	}
 

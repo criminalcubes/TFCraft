@@ -208,10 +208,15 @@ public class ItemFoodTFC extends ItemTerra implements ISize, ICookableFood, IMer
 
 			if(Food.isSalted(is))
 				name.append(TFC_Core.translate("word.salted")).append(' ');
+                        
+                        //showing smoked flag with Cooking. But Only for smoked meat
+			if (Food.isSmoked(is) && 
+                                       (is.getItem() instanceof ItemFoodMeat && Food.isDried(is) && Food.isBrined(is)) ||
+                                       (is.getItem() == TFCItems.cheese))
+				name.append(TFC_Core.translate("word.smoked")).append(' ');
+                        
 			if(Food.isCooked(is))
 				name.append(TFC_Core.translate("word.cooked")).append(' ');
-			else if(Food.isSmoked(is))
-				name.append(TFC_Core.translate("word.smoked")).append(' ');
 
 			if(Food.isDried(is) && !Food.isCooked(is))
 				name.append(TFC_Core.translate("word.dried")).append(' ');
@@ -282,8 +287,11 @@ public class ItemFoodTFC extends ItemTerra implements ISize, ICookableFood, IMer
 			arraylist.add(EnumChatFormatting.DARK_GRAY + TFC_Core.translate("gui.food.decay") + " " + Helper.roundNumber(decay / ounces * 100, 10) + "%");
 		if (TFCOptions.enableDebugMode)
 		{
+                        additionFoodInfosForDebug(is, arraylist);
 			arraylist.add(EnumChatFormatting.DARK_GRAY + TFC_Core.translate("gui.food.decay") + ": " + decay);
 			arraylist.add(EnumChatFormatting.DARK_GRAY + "Decay Rate: " + Helper.roundNumber(this.getDecayRate(is), 100));
+			arraylist.add(EnumChatFormatting.DARK_GRAY + "DecayTimer: " + Food.getDecayTimer(is));
+                        arraylist.add(EnumChatFormatting.DARK_GRAY + "TotalHours: " + TFC_Time.getTotalHours());
 		}
 
 		if (TFC_Core.showCtrlInformation())
@@ -291,7 +299,45 @@ public class ItemFoodTFC extends ItemTerra implements ISize, ICookableFood, IMer
 		else
 			arraylist.add(TFC_Core.translate("gui.showtaste"));
 	}
+        
+        private void additionFoodInfosForDebug(ItemStack is, List<String> arraylist) {
+            arraylist.add(EnumChatFormatting.DARK_GRAY + "FoodID: " + ((IFood) is.getItem()).getFoodID());
+            if (Food.hasCookedProfile(is)) {
+                int[] cookedTasteProfile = Food.getCookedProfile(is);
+                arraylist.add(EnumChatFormatting.DARK_GRAY + "CookedTaste: " + Helper.intsToString(cookedTasteProfile));
+                int[] fuelTasteProfile = Food.getFuelProfile(is);
+                arraylist.add(EnumChatFormatting.DARK_GRAY + "FuelTaste: " + Helper.intsToString(fuelTasteProfile));
+            }
+            
+            if (Food.isCooked(is)) {
+                int seed = Food.getCookedSeed(is);
+                arraylist.add(EnumChatFormatting.DARK_GRAY + "CookedTime: " + Food.getCooked(is));
+                arraylist.add(EnumChatFormatting.DARK_GRAY + "CookedTempLvl: " + Food.getCookedTempLevel(is));
+                arraylist.add(EnumChatFormatting.DARK_GRAY + "CookedFoodSeed: " + seed);
+            } else if (Food.getCooked(is) > 0) {
+                arraylist.add(EnumChatFormatting.DARK_GRAY + "CookedTime: " + Food.getCooked(is));
+            }
+            float temp = TFC_ItemHeat.getTemp(is);
+            if (temp > 0)
+                arraylist.add(EnumChatFormatting.DARK_GRAY + "Temp: " + temp);
 
+            boolean pickled = Food.isPickled(is);
+            boolean smoked = Food.isSmoked(is);//simple hasCookedProfile() not [0 0 0 0 0]
+            boolean brined = Food.isBrined(is);
+            boolean dried = Food.isDried(is);
+            
+            if (brined || dried || smoked) {
+                StringBuilder sb = new StringBuilder();
+                sb.append("Brined:").append(brined ? '+':'-')
+                  .append(" Pickled:").append(pickled ? '+':'-')
+                  .append(" Dried").append(dried ? '+':'-')
+                  .append(':').append(Food.getDried(is))
+                  .append(" Smoked").append(smoked ? '+':'-')
+                  .append(':').append(Food.getSmokeCounter(is));
+                arraylist.add(EnumChatFormatting.DARK_GRAY + sb.toString());
+            }
+        }
+        
 	public static void addTasteInformation(ItemStack is, EntityPlayer player, List<String> arraylist)
 	{
 		IFood food = (IFood) is.getItem();
@@ -612,7 +658,9 @@ public class ItemFoodTFC extends ItemTerra implements ISize, ICookableFood, IMer
 	@Override
 	public boolean isEdible(ItemStack is)
 	{
-		return edible || Food.isCooked(is);
+		return edible || Food.isCooked(is) 
+                        //permission to eat smoked meat
+                        || is != null && (is.getItem() instanceof ItemFoodMeat) && Food.getSmokeCounter(is) >= Food.SMOKEHOURS;
 	}
 
 	@Override
