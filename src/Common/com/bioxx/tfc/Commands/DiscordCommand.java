@@ -46,10 +46,13 @@ public class DiscordCommand extends CommandBase
 
             if (par2ArrayOfStr[0].equals("time"))
             {
+                int month = TFC_Time.getMonth();                
+                String monthName = month>=0 && month<=11 ?  TFC_Time.MONTHS[month]: "?";
+                
                 par1ICommandSender.addChatMessage(new ChatComponentText(String.format(
-                        "```На сервере сейчас %d день %d месяца %d года, %d часов.```",
+                        "```На сервере сейчас %d день месяц - %s %d года, %d часов.```",
                         TFC_Time.getDayOfMonth(),
-                        TFC_Time.getMonth(),
+                        monthName,//TFC_Time.getMonth(),
                         year,
                         TFC_Time.getHour()
                 )));
