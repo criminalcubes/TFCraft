@@ -24,10 +24,16 @@ import com.bioxx.tfc.Blocks.BlockTerraContainer;
 import com.bioxx.tfc.Core.TFCTabs;
 import com.bioxx.tfc.Core.TFC_Core;
 import com.bioxx.tfc.Core.TFC_Time;
+import com.bioxx.tfc.Items.ItemStick;
+import com.bioxx.tfc.Items.Tools.ItemCustomScythe;
+import com.bioxx.tfc.Items.Tools.ItemCustomShovel;
+import com.bioxx.tfc.Items.Tools.ItemKnife;
 import com.bioxx.tfc.TileEntities.TESapling;
 import com.bioxx.tfc.WorldGen.TFCBiome;
 import com.bioxx.tfc.api.TFCOptions;
 import com.bioxx.tfc.api.Constant.Global;
+import com.bioxx.tfc.api.TFCItems;
+import net.minecraft.entity.player.EntityPlayer;
 
 public class BlockSapling extends BlockTerraContainer
 {
@@ -135,10 +141,10 @@ public class BlockSapling extends BlockTerraContainer
 		if (!world.isRemote)
 		{
 			super.updateTick(world, i, j, k, rand);
-
-			if (world.getTileEntity(i, j, k) instanceof TESapling)
+                        TileEntity te = world.getTileEntity(i, j, k);
+			if (te instanceof TESapling)
 			{
-				long timestamp = ((TESapling) world.getTileEntity(i, j, k)).growTime;
+				long timestamp = ((TESapling) te).growTime;
 
 				if (world.getBlockLightValue(i, j + 1, k) >= 9 && TFC_Time.getTotalTicks() > timestamp)
 				{
@@ -233,4 +239,32 @@ public class BlockSapling extends BlockTerraContainer
 			world.setBlockToAir(x, y, z);
 		}
 	}
+        
+	@Override
+	public void harvestBlock(World world, EntityPlayer entityplayer, int x, int y, int z, int meta)
+	{
+            if (world.isRemote) return;
+            
+            ItemStack itemStack = entityplayer.inventory.getCurrentItem();
+            int chance = 40;
+            Item item = itemStack == null? null : itemStack.getItem();
+            if (item == null) {
+                chance = 55;//free hands
+            } else if (item instanceof ItemCustomShovel) {
+                chance = 100;
+            } else if (item instanceof ItemKnife) {
+                chance = 70;
+            } else if (item instanceof ItemStick) {
+                chance = 60;
+            } else if (item instanceof ItemCustomScythe) {
+                chance = 10;
+            }
+            
+            if (chance==100 || world.rand.nextInt(100) < chance) {
+                this.dropBlockAsItem(world, x, y, z, meta, 0);
+            } else {
+                dropBlockAsItem(world, x, y, z, new ItemStack(TFCItems.stick, 1));
+            }            
+            world.setBlockToAir(x, y, z);
+        }
 }

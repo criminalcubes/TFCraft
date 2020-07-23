@@ -70,8 +70,18 @@ public class ItemShears extends ItemTerraTool
 
 	@Override
 	public float func_150893_a(ItemStack is, Block block)
-	{
-		return block != Blocks.web && block.getMaterial() != Material.leaves ? (block == Blocks.wool ? 5.0F : super.func_150893_a(is, block)) : 15.0F;
+	{            
+            float digSpeed;
+            if (block.getMaterial() == Material.leaves) {
+                digSpeed = 4f;
+            } else if(block == Blocks.web) {
+                digSpeed = 15f;
+            } else if (block == Blocks.wool) {
+                digSpeed = 5f;
+            } else {
+                digSpeed = super.func_150893_a(is, block);
+            }
+            return digSpeed;
 	}
 
 	/**
@@ -122,7 +132,7 @@ public class ItemShears extends ItemTerraTool
 			{
 				ArrayList<ItemStack> drops = target.onSheared(itemstack, player.worldObj, x, y, z,
 						EnchantmentHelper.getEnchantmentLevel(Enchantment.fortune.effectId, itemstack));
-				Random rand = new Random();
+				Random rand = player.worldObj.rand;// new Random();
 
 				for(ItemStack stack : drops)
 				{

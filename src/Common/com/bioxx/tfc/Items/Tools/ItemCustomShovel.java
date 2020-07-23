@@ -10,6 +10,7 @@ import net.minecraft.item.ItemStack;
 import com.bioxx.tfc.Reference;
 import com.bioxx.tfc.api.TFCBlocks;
 import com.bioxx.tfc.api.Enums.EnumItemReach;
+import com.bioxx.tfc.Blocks.Flora.BlockSapling;
 import com.google.common.collect.Sets;
 
 public class ItemCustomShovel extends ItemTerraTool
@@ -20,7 +21,8 @@ public class ItemCustomShovel extends ItemTerraTool
 			Blocks.grass, Blocks.dirt, Blocks.sand, Blocks.gravel, Blocks.snow, Blocks.snow_layer,
 			Blocks.clay, Blocks.farmland, Blocks.soul_sand, Blocks.mycelium,
 			TFCBlocks.dirt, TFCBlocks.dirt2, TFCBlocks.grass, TFCBlocks.grass2, TFCBlocks.clayGrass,
-			TFCBlocks.clayGrass2, TFCBlocks.peatGrass, TFCBlocks.peat, TFCBlocks.clay, TFCBlocks.clay2
+			TFCBlocks.clayGrass2, TFCBlocks.peatGrass, TFCBlocks.peat, TFCBlocks.clay, TFCBlocks.clay2, 
+                        TFCBlocks.sapling, TFCBlocks.sapling2
 	});
 
 	public ItemCustomShovel(ToolMaterial par2EnumToolMaterial)
@@ -36,7 +38,13 @@ public class ItemCustomShovel extends ItemTerraTool
 	{
 		return par1Block == Blocks.snow_layer ? true : par1Block == Blocks.snow;
 	}
-
+        
+	@Override
+	public float func_150893_a/*DiggingSpeed*/(ItemStack is, Block block)
+	{            
+            return (block instanceof BlockSapling) ? 3.0f : super.func_150893_a(is, block);
+	}
+        
 	@Override
 	public void registerIcons(IIconRegister registerer)
 	{

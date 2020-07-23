@@ -31,27 +31,35 @@ public class WorldGenCustomFruitTree extends WorldGenerator
 			gen(world, random, i, j, k);
 		return true;
 	}
-
-	public void gen(World world, Random random, int i, int j, int k)
-	{
+        private void setTreeTrunkBlock(World world, int i, int j, int k, int height) {
 		world.setBlock(i, j, k, TFCBlocks.fruitTreeWood, metaId, 0x2);
-		((TEFruitTreeWood)world.getTileEntity(i, j, k)).setTrunk(true);
-		((TEFruitTreeWood)world.getTileEntity(i, j, k)).setHeight(0);
-		((TEFruitTreeWood)world.getTileEntity(i, j, k)).initBirth();
+                TEFruitTreeWood te = (TEFruitTreeWood) world.getTileEntity(i, j, k);
+                te.setTrunk(true);
+                te.setHeight(height);
+                te.initBirth();
+        }
+	public void gen(World world, Random random, int i, int j, int k)
+	{   
+                setTreeTrunkBlock(world, i, j, k, 0);
+                //world.setBlock(i, j, k, TFCBlocks.fruitTreeWood, metaId, 0x2);
+                //((TEFruitTreeWood)world.getTileEntity(i, j, k)).setTrunk(true);
+                //((TEFruitTreeWood)world.getTileEntity(i, j, k)).setHeight(0);
+                //((TEFruitTreeWood)world.getTileEntity(i, j, k)).initBirth();
 
 		if(world.isAirBlock(i, j+1, k))
 		{
-			world.setBlock(i, j+1, k, TFCBlocks.fruitTreeWood, metaId, 0x2);
-			((TEFruitTreeWood)world.getTileEntity(i, j+1, k)).setTrunk(true);
-			((TEFruitTreeWood)world.getTileEntity(i, j+1, k)).setHeight(1);
-			((TEFruitTreeWood)world.getTileEntity(i, j+1, k)).initBirth();
-
+                        setTreeTrunkBlock(world, i, j+1, k, 1);
+                        //world.setBlock(i, j+1, k, TFCBlocks.fruitTreeWood, metaId, 0x2);
+                        //((TEFruitTreeWood)world.getTileEntity(i, j+1, k)).setTrunk(true);
+                        //((TEFruitTreeWood)world.getTileEntity(i, j+1, k)).setHeight(1);
+                        //((TEFruitTreeWood)world.getTileEntity(i, j+1, k)).initBirth();
 			if(world.isAirBlock(i, j+2, k))
 			{
-				world.setBlock(i, j+2, k, TFCBlocks.fruitTreeWood, metaId, 0x2);
-				((TEFruitTreeWood)world.getTileEntity(i, j+2, k)).setTrunk(true);
-				((TEFruitTreeWood)world.getTileEntity(i, j+2, k)).setHeight(2);
-				((TEFruitTreeWood)world.getTileEntity(i, j+2, k)).initBirth();
+                                setTreeTrunkBlock(world, i, j+2, k, 2);
+                                //world.setBlock(i, j+2, k, TFCBlocks.fruitTreeWood, metaId, 0x2);
+                                //((TEFruitTreeWood)world.getTileEntity(i, j+2, k)).setTrunk(true);
+                                //((TEFruitTreeWood)world.getTileEntity(i, j+2, k)).setHeight(2);
+                                //((TEFruitTreeWood)world.getTileEntity(i, j+2, k)).initBirth();
 				surroundWithLeaves(world, i, j + 2, k);
 
 				if(world.isAirBlock(i+1, j+2, k) || world.getBlock(i+1, j+2, k) == leavesBlock)
@@ -73,10 +81,11 @@ public class WorldGenCustomFruitTree extends WorldGenerator
 
 				if(world.isAirBlock(i, j+3, k) || world.getBlock(i, j+3, k) == leavesBlock)
 				{
-					world.setBlock(i, j+3, k, TFCBlocks.fruitTreeWood, metaId, 0x2);
-					((TEFruitTreeWood)world.getTileEntity(i, j+3, k)).setTrunk(true);
-					((TEFruitTreeWood)world.getTileEntity(i, j+3, k)).setHeight(3);
-					((TEFruitTreeWood)world.getTileEntity(i, j+3, k)).initBirth();
+                                        setTreeTrunkBlock(world, i, j+3, k, 3);
+                                        //world.setBlock(i, j+3, k, TFCBlocks.fruitTreeWood, metaId, 0x2);
+                                        //((TEFruitTreeWood)world.getTileEntity(i, j+3, k)).setTrunk(true);
+                                        //((TEFruitTreeWood)world.getTileEntity(i, j+3, k)).setHeight(3);
+                                        //((TEFruitTreeWood)world.getTileEntity(i, j+3, k)).initBirth();
 					if (world.isAirBlock(i, j + 4, k))
 						world.setBlock(i, j + 4, k, leavesBlock, metaId & 7, 0x2);
 				}

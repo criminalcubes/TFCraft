@@ -30,6 +30,10 @@ import com.bioxx.tfc.api.TFCBlocks;
 import com.bioxx.tfc.api.TFCItems;
 import com.bioxx.tfc.api.TFCOptions;
 import com.bioxx.tfc.api.Constant.Global;
+import com.bioxx.tfc.Items.Tools.ItemCustomScythe;
+import com.bioxx.tfc.Items.Tools.ItemCustomAxe;
+import com.bioxx.tfc.Items.Tools.ItemShears;
+import com.bioxx.tfc.Items.Tools.ItemKnife;
 
 public class BlockCustomLeaves extends BlockLeaves implements IShearable
 {
@@ -142,7 +146,7 @@ public class BlockCustomLeaves extends BlockLeaves implements IShearable
 						{
 							Block block = world.getBlock(xOrig + xd, yOrig + yd, zOrig + zd);
 
-							if (block == TFCBlocks.logNatural || block == TFCBlocks.logNatural2)
+							if (block == TFCBlocks.logNatural || block == TFCBlocks.logNatural2 || block == TFCBlocks.woodVert || block == TFCBlocks.woodVert2)
 								this.adjacentTreeBlocks[xd + center][yd + center][zd + center] = 0;
 							else if (block == this && var6 == world.getBlockMetadata(xOrig + xd, yOrig + yd, zOrig + zd))
 								this.adjacentTreeBlocks[xd + center][yd + center][zd + center] = -2;
@@ -202,10 +206,12 @@ public class BlockCustomLeaves extends BlockLeaves implements IShearable
 	{
 		world.setBlockToAir(x, y, z);
 	}
-
+        /**
+         * not use not. Previously used in AOE harvest by Scythe
+         */
 	private void removeLeaves(World world, int x, int y, int z)
 	{
-		dropBlockAsItem(world, x, y, z, world.getBlockMetadata(x, y, z), 0);
+		dropBlockAsItem(world, x, y, z, world.getBlockMetadata(x, y, z), 0);//dropBlockAsItemWithChance - empty
 		if(world.rand.nextInt(100) < 30)
 			dropBlockAsItem(world, x, y, z, new ItemStack(TFCItems.stick, 1));
 		world.setBlockToAir(x, y, z);
@@ -232,57 +238,92 @@ public class BlockCustomLeaves extends BlockLeaves implements IShearable
 	@Override
 	public void harvestBlock(World world, EntityPlayer entityplayer, int i, int j, int k, int meta)
 	{
-		if (!world.isRemote)
-		{
-			ItemStack itemstack = entityplayer.inventory.getCurrentItem();
-			int[] equipIDs = OreDictionary.getOreIDs(itemstack);
-			for (int id : equipIDs)
-			{
-				String name = OreDictionary.getOreName(id);
-				if (name.startsWith("itemScythe"))
-				{
-					for (int x = -1; x < 2; x++)
-					{
-						for (int z = -1; z < 2; z++)
-						{
-							for (int y = -1; y < 2; y++)
-							{
-								if (world.getBlock(i + x, j + y, k + z).getMaterial() == Material.leaves &&
-									entityplayer.inventory.getStackInSlot(entityplayer.inventory.currentItem) != null)
-								{
-									entityplayer.addStat(StatList.mineBlockStatArray[getIdFromBlock(this)], 1);
-									entityplayer.addExhaustion(0.045F);
-									if (world.rand.nextInt(100) < 11)
-										dropBlockAsItem(world, i + x, j + y, k + z, new ItemStack(TFCItems.stick, 1));
-									else if (world.rand.nextInt(100) < 4 && TFCOptions.enableSaplingDrops)
-										dropSapling(world, i + x, j + y, k + z, meta);
-									removeLeaves(world, i + x, j + y, k + z);
-									super.harvestBlock(world, entityplayer, i + x, j + y, k + z, meta);
-
-									itemstack.damageItem(1, entityplayer);
-									if (itemstack.stackSize == 0)
-										entityplayer.inventory.setInventorySlotContents(entityplayer.inventory.currentItem, null);
-								}
-							}
-						}
-					}
-					return;
-				}
-			}
-
-			// Only executes if scythe wasn't found
-			entityplayer.addStat(StatList.mineBlockStatArray[getIdFromBlock(this)], 1);
-			entityplayer.addExhaustion(0.025F);
-			if (world.rand.nextInt(100) < 28)
-				dropBlockAsItem(world, i, j, k, new ItemStack(TFCItems.stick, 1));
-			else if (world.rand.nextInt(100) < 6 && TFCOptions.enableSaplingDrops)
-				dropSapling(world, i, j, k, meta);
-
-			super.harvestBlock(world, entityplayer, i, j, k, meta);
-
-		}
+		if (world.isRemote) return;//ServerSide only
+                
+                ItemStack itemstack = entityplayer.inventory.getCurrentItem();
+                //freehands high chance to drop stick 
+                if (itemstack == null) {                            
+                    harvest(world, entityplayer, i, j, k, meta, 0.125f, 30, 8, 0);
+                }
+                //scythe
+                else if (itemstack.getItem() instanceof ItemCustomScythe) {
+                    //harvest AOE see like com\bioxx\tfc\Blocks\Vanilla\BlockCustomTallGrass.java
+                    for (int x = -1; x < 2; x++)
+                        for (int z = -1; z < 2; z++)
+                            for (int y = -1; y < 2; y++) {
+                                int xx = i+x, yy = j+y, zz= k+z;
+                                if (world.getBlock(xx, yy, zz).getMaterial() == Material.leaves) 
+                                // && entityplayer.inventory.getStackInSlot(entityplayer.inventory.currentItem) != null 
+                                {
+                                    harvest(world, entityplayer, xx, yy, zz, meta, 0.045f, 
+                                            35, // stickChance //old: chance 11 + 30 in removeLeaves() 
+                                            4,  // saplingChance
+                                            0); // leavesChance
+                                    destroyLeaves(world, xx, yy, zz);//removeLeaves(world, xx, yy, zz);
+                                    if (!canHarvestAfterDamageItem(entityplayer,itemstack))
+                                        break;//dont work without scythe
+                                }
+                            }
+                }
+                //knife
+                else if (itemstack.getItem() instanceof ItemKnife) {
+                    harvest(world, entityplayer, i, j, k, meta, 0.025f, 45, 12, 0);
+                    canHarvestAfterDamageItem(entityplayer, itemstack);
+                }
+                //axe
+                else if (itemstack.getItem() instanceof ItemCustomAxe) {
+                    harvest(world, entityplayer, i, j, k, meta, 0.025f, 30, 19, 0);
+                    canHarvestAfterDamageItem(entityplayer, itemstack);
+                }
+                //shears chance for drop leaves block
+                else if (itemstack.getItem() instanceof ItemShears) {
+                    harvest(world, entityplayer, i, j, k, meta, 0.025f, 20, 3, 40/*leavesChance*/);
+                    canHarvestAfterDamageItem(entityplayer, itemstack);
+                }
+                // other cases not free Hands //Only executes if scythe,shears,knife wasn't found
+                else {
+                    harvest(world, entityplayer, i, j, k, meta, 0.125f, 20, 5, 0);
+                }
+                //old way to check to has Scythe
+                //int[] equipIDs = OreDictionary.getOreIDs(itemstack);
+                //for (int id : equipIDs) {
+                //        String name = OreDictionary.getOreName(id);
+                //        if (name.startsWith("itemScythe")) {
+                //            //action
+                //            return;
+                //        }
+                //}
 	}
-
+        
+        protected void harvest(World world, EntityPlayer entityplayer, int x, int y, int z, int meta, float exhaustion, int stickChanсe, int saplingChance, int leavesChance) 
+        {
+                //StatBase sb = StatList.mineBlockStatArray[blockId];
+                entityplayer.addStat(StatList.mineBlockStatArray[getIdFromBlock(this)], 1);//no-op mineBlockStatArray[id] return null 
+                entityplayer.addExhaustion(exhaustion);//0.025F
+                if (world.rand.nextInt(100) < stickChanсe)// 28
+                        dropBlockAsItem(world, x, y, z, new ItemStack(TFCItems.stick, 1));
+                else if (world.rand.nextInt(100) < saplingChance/*6*/ && TFCOptions.enableSaplingDrops)
+                        dropSapling(world, x, y, z, meta);
+                else if (leavesChance > 0 && world.rand.nextInt(100) < leavesChance) {
+                        dropLeaves(world, x, y, z, meta);
+                }
+                super.harvestBlock(world, entityplayer, x, y, z, meta);// no-op call method sequence:
+                //net.minecraft.block.BlockLeaves:harvestBlock() -> net.minecraft.block.Block:harvestBlock() -> dropBlockAsItem() -> dropBlockAsItemWithChance() -> no-op
+        }
+        protected boolean canHarvestAfterDamageItem(EntityPlayer entityplayer, ItemStack itemstack) {
+                itemstack.damageItem(1, entityplayer);
+                if (itemstack.stackSize == 0) {
+                        entityplayer.inventory.setInventorySlotContents(entityplayer.inventory.currentItem, null);
+                        return false;
+                }
+                return true;
+        }
+                
+	protected void dropLeaves(World world, int x, int y, int z, int meta)
+	{
+		dropBlockAsItem(world, x, y, z, new ItemStack(this, 1, meta));//world.getBlockMetadata(x, y, z)
+	}
+        
 	protected void dropSapling(World world, int x, int y, int z, int meta)
 	{
 		if (meta != 9 && meta != 15)

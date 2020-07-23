@@ -10,11 +10,13 @@ import com.bioxx.tfc.Core.TFCTabs;
 import com.bioxx.tfc.api.TFCBlocks;
 import com.bioxx.tfc.api.Enums.EnumItemReach;
 import com.google.common.collect.Sets;
+import net.minecraft.block.material.Material;
+import com.bioxx.tfc.Blocks.Flora.BlockSapling;
 
 public class ItemCustomScythe extends ItemTerraTool
 {
 	private static final Set<Block> BLOCKS = Sets.newHashSet(new Block[]
-	{ TFCBlocks.leaves, TFCBlocks.leaves2 });
+	{ TFCBlocks.leaves, TFCBlocks.leaves2, TFCBlocks.tallGrass, TFCBlocks.sapling, TFCBlocks.sapling2 });
 
 	public ItemCustomScythe(ToolMaterial e)
 	{
@@ -36,5 +38,19 @@ public class ItemCustomScythe extends ItemTerraTool
 	public EnumItemReach getReach(ItemStack is)
 	{
 		return EnumItemReach.FAR;
+	}
+        
+	@Override
+	public float func_150893_a(ItemStack is, Block block)
+	{            
+            float digSpeed;
+            if (block.getMaterial() == Material.leaves) {
+                digSpeed = 0.8f;
+            } else if (block instanceof BlockSapling) {
+                digSpeed = 10f;
+            } else {
+                digSpeed = super.func_150893_a(is, block);
+            }
+            return digSpeed;
 	}
 }

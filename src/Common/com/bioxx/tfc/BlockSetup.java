@@ -327,10 +327,10 @@ public class BlockSetup extends TFCBlocks
 
 		planks = new BlockPlanks(Material.wood).setHardness(4.0F).setResistance(5.0F).setStepSound(Block.soundTypeWood).setBlockName("wood");
 		planks2 = new BlockPlanks2(Material.wood).setHardness(4.0F).setResistance(5.0F).setStepSound(Block.soundTypeWood).setBlockName("wood2");
-		leaves = new BlockCustomLeaves().setHardness(0.2F).setLightOpacity(1).setStepSound(Block.soundTypeGrass).setBlockName("leaves").setCreativeTab(TFCTabs.TFC_DECORATION);
-		leaves2 = new BlockCustomLeaves2().setHardness(0.2F).setLightOpacity(1).setStepSound(Block.soundTypeGrass).setBlockName("leaves2");
-		sapling = new BlockSapling().setHardness(0.0F).setStepSound(Block.soundTypeGrass).setBlockName("sapling");
-		sapling2 = new BlockSapling2().setHardness(0.0F).setStepSound(Block.soundTypeGrass).setBlockName("sapling2");
+		leaves = new BlockCustomLeaves().setHardness(0.5F).setLightOpacity(1).setStepSound(Block.soundTypeGrass).setBlockName("leaves").setCreativeTab(TFCTabs.TFC_DECORATION);
+		leaves2 = new BlockCustomLeaves2().setHardness(0.5F).setLightOpacity(1).setStepSound(Block.soundTypeGrass).setBlockName("leaves2");
+		sapling = new BlockSapling().setHardness(2.5F).setStepSound(Block.soundTypeGrass).setBlockName("sapling");
+		sapling2 = new BlockSapling2().setHardness(2.5F).setStepSound(Block.soundTypeGrass).setBlockName("sapling2");
 
 		logNatural = new BlockLogNatural().setHardness(50.0F).setStepSound(Block.soundTypeWood).setBlockName("log");
 		logNatural2 = new BlockLogNatural2().setHardness(50.0F).setStepSound(Block.soundTypeWood).setBlockName("log2");
