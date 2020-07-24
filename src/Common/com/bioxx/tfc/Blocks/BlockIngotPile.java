@@ -370,6 +370,8 @@ public class BlockIngotPile extends BlockTerraContainer
 	@Override
 	public void onNeighborBlockChange(World world, int x, int y, int z, Block block)
 	{
+           	if(!world.isRemote)	
+		{
 			if ( !world.isSideSolid(x, y - 1, z, ForgeDirection.UP))// && world.getTileEntity(x, y, z) instanceof TEIngotPile)
 			{
                                 TileEntity ate = world.getTileEntity(x, y, z);
@@ -408,6 +410,7 @@ public class BlockIngotPile extends BlockTerraContainer
 					return;
 				}
 			}
+                }
 	}
 
 	@Override
