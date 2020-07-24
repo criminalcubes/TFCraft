@@ -2,6 +2,7 @@ package com.bioxx.tfc.Items;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
@@ -154,11 +155,11 @@ public class ItemMetalSheet extends ItemTerra implements ISmeltable
 		Block block = world.getBlock(i, j, k);
 		if (block.isAir(world, i, j, k))
 			return true;
-		if (block == TFCBlocks.metalSheet && world.getTileEntity(i, j, k) instanceof TEMetalSheet)
+		if (block == TFCBlocks.metalSheet)// && world.getTileEntity(i, j, k) instanceof TEMetalSheet)
 		{
-			TEMetalSheet te = (TEMetalSheet)world.getTileEntity(i, j, k);
-			if(te.metalID == this.metalID)
-				return true;
+                        TileEntity ate = world.getTileEntity(i, j, k);
+                        if (ate instanceof TEMetalSheet && ((TEMetalSheet)ate).metalID == this.metalID )
+                            return true;
 		}
 		return false;
 	}

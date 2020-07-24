@@ -46,33 +46,33 @@ public class BlockFirepit extends BlockTerraContainer
 	{
 		if (!world.isRemote)
 		{
+                        TileEntity ate = world.getTileEntity(x, y, z);
+                        if (!(ate instanceof TEFirepit)) return true;
+                        
 			ItemStack equippedItem = entityplayer.getCurrentEquippedItem();
 			if (equippedItem != null)
 			{
 				Item item = entityplayer.getCurrentEquippedItem().getItem();
 				if (item instanceof ItemFirestarter || item instanceof ItemFlintAndSteel)
 				{
-					if ((TEFirepit) world.getTileEntity(x, y, z) != null)
-					{
-						TEFirepit te = (TEFirepit) world.getTileEntity(x, y, z);
-						if (te.fireTemp < 210 && te.fireItemStacks[5] != null)
-						{
-							te.fireTemp = 300;
-							if (item instanceof ItemFlintAndSteel)
-							{
-								Random rand = new Random();
-								world.playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, "fire.ignite", 1.0F, rand.nextFloat() * 0.4F + 0.8F);
-							}
-							equippedItem.damageItem(1, entityplayer);
-							world.setBlockMetadataWithNotify(x, y, z, 1, 3);
-							return true;
-						}
-					}
+                                        TEFirepit te = (TEFirepit) ate;
+                                        if (te.fireTemp < 210 && te.fireItemStacks[5] != null)
+                                        {
+                                                te.fireTemp = 300;
+                                                if (item instanceof ItemFlintAndSteel)
+                                                {
+                                                        Random rand = world.rand;//new Random();
+                                                        world.playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, "fire.ignite", 1.0F, rand.nextFloat() * 0.4F + 0.8F);
+                                                }
+                                                equippedItem.damageItem(1, entityplayer);
+                                                world.setBlockMetadataWithNotify(x, y, z, 1, 3);
+                                                return true;
+                                        }
 				}
 			}
 
-			if ((TEFirepit) world.getTileEntity(x, y, z) != null)
-				entityplayer.openGui(TerraFirmaCraft.instance, 20, world, x, y, z);
+			//if ((TEFirepit) world.getTileEntity(x, y, z) != null)
+			entityplayer.openGui(TerraFirmaCraft.instance, 20, world, x, y, z);
 		}
 
 		return true;
@@ -109,7 +109,9 @@ public class BlockFirepit extends BlockTerraContainer
 	{
 		if (!TFC_Core.isTopFaceSolid(world, x, y - 1, z))
 		{
-			((TEFirepit)world.getTileEntity(x, y, z)).ejectContents();
+                        TileEntity ate = world.getTileEntity(x, y, z);
+                        if (ate instanceof TEFirepit)
+                            ((TEFirepit)ate).ejectContents();
 			world.setBlockToAir(x, y, z);
 			return;
 		}
@@ -118,8 +120,10 @@ public class BlockFirepit extends BlockTerraContainer
 	@Override
 	public void randomDisplayTick(World world, int x, int y, int z, Random rand)
 	{
-		int meta = world.getBlockMetadata(x, y, z);
-		if (meta >= 1)
+		//int meta = world.getBlockMetadata(x, y, z);
+                TileEntity ate = world.getTileEntity(x, y, z);
+                float fireTemp = ate instanceof TEFirepit ? ((TEFirepit)ate).fireTemp : 0;
+                if (fireTemp > 1)//if (meta >= 1)
 		{
 			if (rand.nextInt(24) == 0)
 				world.playSoundEffect(x, y, z, "fire.fire", 0.4F + (rand.nextFloat() / 2), 0.7F + rand.nextFloat());
@@ -132,10 +136,14 @@ public class BlockFirepit extends BlockTerraContainer
 			float f5 = rand.nextFloat() * -0.6F;
 			float f6 = rand.nextFloat() * -0.6F;
 			world.spawnParticle("smoke", f + f4 - 0.3F, f1,  f2 + f5 + 0.3F, 0.0D, 0.0D, 0.0D);
-			world.spawnParticle("flame", f + f4 - 0.3F, f1,  f2 + f5 + 0.3F, 0.0D, 0.0D, 0.0D);
 			world.spawnParticle("smoke", f + f5 + 0.3F , f1, f2 + f4 - 0.3F, 0.0D, 0.0D, 0.0D);
-			world.spawnParticle("flame", f + f5 + 0.3F , f1, f2 + f4 - 0.3F, 0.0D, 0.0D, 0.0D);
-			if (((TEFirepit)world.getTileEntity(x, y, z)).fireTemp > 550)
+                        
+                        if (fireTemp > 100) 
+                                world.spawnParticle("flame", f + f4 - 0.3F, f1,  f2 + f5 + 0.3F, 0.0D, 0.0D, 0.0D);
+                        if (fireTemp > 300)
+                                world.spawnParticle("flame", f + f5 + 0.3F , f1, f2 + f4 - 0.3F, 0.0D, 0.0D, 0.0D);
+                        
+			if (fireTemp > 550)
 			{
 				world.spawnParticle("flame", f + f5 + 0.3F , f1, f2 + f6 + 0.2F, 0.0D, 0.0D, 0.0D);
 				world.spawnParticle("flame", f + f4 - 0.3F , f1, f2 + f6 + 0.1F, 0.0D, 0.0D, 0.0D);

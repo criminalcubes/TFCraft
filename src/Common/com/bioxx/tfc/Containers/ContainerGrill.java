@@ -2,6 +2,7 @@ package com.bioxx.tfc.Containers;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.inventory.ICrafting;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
@@ -25,10 +26,10 @@ public class ContainerGrill extends ContainerTFC
 	{
 		//this.grill = grill;
 		firetemp = -1111;
-
-		if(world.getTileEntity(x, y-1, z) instanceof TEFireEntity)
+                TileEntity ate = world.getTileEntity(x, y-1, z);
+		if(ate/*world.getTileEntity(x, y-1, z)*/ instanceof TEFireEntity)
 		{
-			fire = (TEFireEntity)world.getTileEntity(x, y-1, z);
+			fire = (TEFireEntity)ate;//world.getTileEntity(x, y-1, z);
 		}
 
 		//Input slot

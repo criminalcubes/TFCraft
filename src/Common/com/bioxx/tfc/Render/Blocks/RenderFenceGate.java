@@ -4,6 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockDirectional;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.IBlockAccess;
 
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
@@ -25,8 +26,12 @@ public class RenderFenceGate  implements ISimpleBlockRenderingHandler
 	{
 		Block par1BlockFenceGate = ((IMultipleBlock)block).getBlockTypeForRender();
 		boolean flag = true;
-		int l = ((TEFenceGate)renderer.blockAccess.getTileEntity(par2, par3, par4)).getDirection();
-		boolean flag1 = ((TEFenceGate)renderer.blockAccess.getTileEntity(par2, par3, par4)).getOpen();
+
+                TileEntity ate = renderer.blockAccess.getTileEntity(par2, par3, par4);
+                if (!(ate instanceof TEFenceGate)) return flag;
+                
+		int l = ((TEFenceGate)ate).getDirection();//renderer.blockAccess.getTileEntity(x, y, z)
+		boolean flag1 = ((TEFenceGate)ate).getOpen();//renderer.blockAccess.getTileEntity(x, y, z)
 		int i1 = BlockDirectional.getDirection(l);
 		float f = 0.375F;
 		float f1 = 0.5625F;

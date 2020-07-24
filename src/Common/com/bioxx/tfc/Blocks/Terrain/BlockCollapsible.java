@@ -7,6 +7,7 @@ import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.stats.StatList;
@@ -334,18 +335,21 @@ public class BlockCollapsible extends BlockTerraContainer
 				world.setBlockToAir(x, y, z);
 			}
 
-			if(world.getBlock(x, y-1, z) == TFCBlocks.stoneSlabs && ((TEPartial)world.getTileEntity(x, y-1, z)).blockType == this &&
-					((TEPartial)world.getTileEntity(x, y-1, z)).metaID == fallingBlockMeta)
+                        //if(world.getBlock(x, y-1, z) == TFCBlocks.stoneSlabs && ((TEPartial)world.getTileEntity(x, y-1, z)).blockType == this &&
+                        //                ((TEPartial)world.getTileEntity(x, y-1, z)).metaID == fallingBlockMeta)
+                        if(canBreak(world,x,y-1,z,TFCBlocks.stoneSlabs,fallingBlockMeta))
 			{
 				world.setBlockToAir(x, y-1, z);
 
-				if(world.getBlock(x, y-2, z) == TFCBlocks.stoneSlabs && ((TEPartial)world.getTileEntity(x, y-2, z)).blockType == this &&
-						((TEPartial)world.getTileEntity(x, y-2, z)).metaID == fallingBlockMeta)
+                                //if(world.getBlock(x, y-2, z) == TFCBlocks.stoneSlabs && ((TEPartial)world.getTileEntity(x, y-2, z)).blockType == this &&
+                                //                ((TEPartial)world.getTileEntity(x, y-2, z)).metaID == fallingBlockMeta)
+                                if(canBreak(world,x,y-2,z,TFCBlocks.stoneSlabs,fallingBlockMeta))
 				{
 					world.setBlockToAir(x, y-2, z);
 
-					if(world.getBlock(x, y-3, z) == TFCBlocks.stoneSlabs && ((TEPartial)world.getTileEntity(x, y-3, z)).blockType == this &&
-							((TEPartial)world.getTileEntity(x, y-3, z)).metaID == fallingBlockMeta)
+					//if(world.getBlock(x, y-3, z) == TFCBlocks.stoneSlabs && ((TEPartial)world.getTileEntity(x, y-3, z)).blockType == this &&
+					//		((TEPartial)world.getTileEntity(x, y-3, z)).metaID == fallingBlockMeta)
+                                        if(canBreak(world,x,y-3,z,TFCBlocks.stoneSlabs,fallingBlockMeta))
 						world.setBlockToAir(x, y-3, z);
 				}
 			}
@@ -354,6 +358,20 @@ public class BlockCollapsible extends BlockTerraContainer
 		}
 		return false;
 	}
+        /**
+         * Optimization for this condition
+         * if (world.getBlock(x, y-1, z) == TFCBlocks.stoneSlabs && ((TEPartial)world.getTileEntity(x, y-1, z)).blockType == this && ((TEPartial)world.getTileEntity(x, y-1, z)).metaID == fallingBlockMeta)
+         */
+        private boolean canBreak(World world, int x, int y, int z, Block block, int fallingBlockMeta) {
+            if (world.getBlock(x, y, z) != block) return false;
+            
+            TileEntity ate = world.getTileEntity(x, y, z);
+            if (ate instanceof TEPartial) {
+                TEPartial tep = (TEPartial) ate;
+                return tep.blockType == this && tep.metaID == fallingBlockMeta;
+            }
+            return false;
+        }
 
 	public static void tryToFall(World world, int x, int y, int z, Block block)
 	{

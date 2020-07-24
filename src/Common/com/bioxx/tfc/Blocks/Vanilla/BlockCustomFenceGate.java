@@ -101,11 +101,10 @@ public class BlockCustomFenceGate extends BlockFenceGate implements ITileEntityP
 	}
 
 	@Override
-	public boolean getBlocksMovement(IBlockAccess par1IBlockAccess, int par2, int par3, int par4)
+	public boolean getBlocksMovement(IBlockAccess world, int x, int y, int z)
 	{
-		if (par1IBlockAccess.getTileEntity(par3, par3, par4) instanceof TEFenceGate)
-			return ((TEFenceGate) (par1IBlockAccess.getTileEntity(par2, par3, par4))).getOpen();
-		return false;
+                TileEntity ate = world.getTileEntity(x, y, z);
+                return (ate instanceof TEFenceGate) ? ((TEFenceGate)ate).getOpen() : false;
 	}
 
 	@Override

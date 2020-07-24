@@ -68,10 +68,12 @@ public class BlockSluice extends BlockContainer
 		else
 		{
 			if(!isBlockFootOfBed(meta))
-				if((TESluice)world.getTileEntity(i, j, k)!=null)
+                        {
+                                TileEntity ate = world.getTileEntity(i, j, k);
+				if(ate instanceof TESluice)
 				{
 					TESluice tileentitysluice;
-					tileentitysluice = (TESluice)world.getTileEntity(i, j, k);
+					tileentitysluice = (TESluice)ate;//world.getTileEntity(i, j, k);
 					ItemStack is =entityplayer.getCurrentEquippedItem();
 					if(is != null && is.getItem() == TFCItems.goldPan && is.getItemDamage() != 0)
 					{
@@ -89,6 +91,7 @@ public class BlockSluice extends BlockContainer
 					entityplayer.openGui(TerraFirmaCraft.instance, 25, world, i, j, k);
 					//ModLoader.openGUI(entityplayer, new GuiTerraSluice(entityplayer.inventory, tileentitysluice));
 				}
+                        }
 			return true;
 		}
 	}

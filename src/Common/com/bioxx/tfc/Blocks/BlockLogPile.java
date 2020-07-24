@@ -46,9 +46,10 @@ public class BlockLogPile extends BlockTerraContainer
 	@Override
 	public boolean isFireSource(World world, int x, int y, int z, ForgeDirection side)
 	{
-		if (world.getTileEntity(x,y,z) instanceof TELogPile && side == UP)
+		if (side == UP)//world.getTileEntity(x,y,z) instanceof TELogPile
 		{
-			if (((TELogPile) world.getTileEntity(x, y, z)).isOnFire)
+                        TileEntity ate = world.getTileEntity(x, y, z);
+			if (ate instanceof TELogPile && ((TELogPile) ate).isOnFire)
 				return true;
 		}
 		return false;
@@ -136,11 +137,15 @@ public class BlockLogPile extends BlockTerraContainer
 
 	public void eject(World world, int x, int y, int z)
 	{
-		if (!world.isRemote && world.getTileEntity(x, y, z) instanceof TELogPile)
-		{
-			TELogPile te = (TELogPile) world.getTileEntity(x, y, z);
-			te.ejectContents();
-			world.removeTileEntity(x, y, z);
+		if (!world.isRemote)// && world.getTileEntity(x, y, z) instanceof TELogPile)
+		{   
+                        TileEntity ate = world.getTileEntity(x, y, z);
+                        if (ate instanceof TELogPile)
+                        {
+                            TELogPile te = (TELogPile) ate;//world.getTileEntity(x, y, z);
+                            te.ejectContents();
+                            world.removeTileEntity(x, y, z);
+                        }
 		}
 	}
 
@@ -184,9 +189,11 @@ public class BlockLogPile extends BlockTerraContainer
 	@Override
 	public void onNeighborBlockChange(World world, int x, int y, int z, Block block)
 	{
-		if (!world.isRemote && world.getTileEntity(x, y, z) instanceof TELogPile)
+		if (!world.isRemote)// && world.getTileEntity(x, y, z) instanceof TELogPile)
 		{
-			((TELogPile) world.getTileEntity(x, y, z)).lightNeighbors();
+                        TileEntity ate = world.getTileEntity(x, y, z);
+                        if (ate instanceof TELogPile)
+                            ((TELogPile) ate).lightNeighbors();
 		}
 	}
 

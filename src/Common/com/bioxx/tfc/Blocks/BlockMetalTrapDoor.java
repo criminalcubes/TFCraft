@@ -126,8 +126,10 @@ public class BlockMetalTrapDoor extends BlockTerraContainer
 	@Override
 	public void setBlockBoundsBasedOnState(IBlockAccess access, int x, int y, int z)
 	{
-		if(access.getTileEntity(x, y, z) != null && access.getTileEntity(x, y, z) instanceof TEMetalTrapDoor)
-			this.setBlockBoundsForBlockRender(access.getBlockMetadata(x, y, z), ((TEMetalTrapDoor)access.getTileEntity(x, y, z)).data);
+            TileEntity ate = access.getTileEntity(x, y, z);
+            if (ate instanceof TEMetalTrapDoor) {
+                this.setBlockBoundsForBlockRender(access.getBlockMetadata(x, y, z), ((TEMetalTrapDoor)ate).data);
+            }
 	}
 
 	/**
@@ -293,10 +295,11 @@ public class BlockMetalTrapDoor extends BlockTerraContainer
 	{
 		if(!world.isRemote)
 		{
-			TEMetalTrapDoor te = (TEMetalTrapDoor)world.getTileEntity(i, j, k);
-			if(te != null && te.sheetStack != null)
+                        TileEntity ate = world.getTileEntity(i, j, k);
+			//TEMetalTrapDoor te = (TEMetalTrapDoor)world.getTileEntity(i, j, k);
+			if(ate instanceof TEMetalTrapDoor && ((TEMetalTrapDoor)ate).sheetStack != null)
 			{
-				EntityItem ei = new EntityItem(world, i, j, k, te.sheetStack);
+				EntityItem ei = new EntityItem(world, i, j, k, ((TEMetalTrapDoor)ate).sheetStack);
 				world.spawnEntityInWorld(ei);
 			}
 		}

@@ -95,42 +95,54 @@ public class BlockBlastFurnace extends BlockTerraContainer
 		int xCoord = x-1;
 		int zCoord = z;
 		if (world.blockExists(xCoord, y, zCoord) &&!(xCoord == stackX && zCoord == stackZ) &&
-				world.getBlock(xCoord, y, zCoord) == TFCBlocks.metalSheet && world.getTileEntity(xCoord, y, zCoord) instanceof TEMetalSheet)
+				world.getBlock(xCoord, y, zCoord) == TFCBlocks.metalSheet)// && world.getTileEntity(xCoord, y, zCoord) instanceof TEMetalSheet)
 		{
-			TEMetalSheet te = (TEMetalSheet)world.getTileEntity(xCoord, y, zCoord);
-			if(!te.westExists() || !isValidMetalSheet(te))
-				return false;
-			count++;
+                        TileEntity ate = world.getTileEntity(xCoord, y, zCoord);
+                        if (ate instanceof TEMetalSheet) {
+                            TEMetalSheet te = (TEMetalSheet) ate;
+                            if(!te.westExists() || !isValidMetalSheet(te))
+                                    return false;
+                            count++;
+                        }
 		}
 		xCoord = x+1;
 		zCoord = z;
 		if (world.blockExists(xCoord, y, zCoord) &&!(xCoord == stackX && zCoord == stackZ) &&
-				world.getBlock(xCoord, y, zCoord) == TFCBlocks.metalSheet && world.getTileEntity(xCoord, y, zCoord) instanceof TEMetalSheet)
+				world.getBlock(xCoord, y, zCoord) == TFCBlocks.metalSheet)// && world.getTileEntity(xCoord, y, zCoord) instanceof TEMetalSheet)
 		{
-			TEMetalSheet te = (TEMetalSheet)world.getTileEntity(xCoord, y, zCoord);
-			if(!te.eastExists() || !isValidMetalSheet(te))
-				return false;
-			count++;
+                        TileEntity ate = world.getTileEntity(xCoord, y, zCoord);
+                        if (ate instanceof TEMetalSheet) {
+                            TEMetalSheet te = (TEMetalSheet) ate;
+                            if(!te.eastExists() || !isValidMetalSheet(te))
+                                    return false;
+                            count++;
+                        }
 		}
 		xCoord = x;
 		zCoord = z-1;
 		if (world.blockExists(xCoord, y, zCoord) &&!(xCoord == stackX && zCoord == stackZ) &&
-				world.getBlock(xCoord, y, zCoord) == TFCBlocks.metalSheet && world.getTileEntity(xCoord, y, zCoord) instanceof TEMetalSheet)
+				world.getBlock(xCoord, y, zCoord) == TFCBlocks.metalSheet)// && world.getTileEntity(xCoord, y, zCoord) instanceof TEMetalSheet)
 		{
-			TEMetalSheet te = (TEMetalSheet)world.getTileEntity(xCoord, y, zCoord);
-			if(!te.southExists() || !isValidMetalSheet(te))
-				return false;
-			count++;
+                        TileEntity ate = world.getTileEntity(xCoord, y, zCoord);
+                        if (ate instanceof TEMetalSheet) {
+                            TEMetalSheet te = (TEMetalSheet) ate;
+                            if(!te.southExists() || !isValidMetalSheet(te))
+                                    return false;
+                            count++;
+                        }        
 		}
 		xCoord = x;
 		zCoord = z+1;
 		if (world.blockExists(xCoord, y, zCoord) &&!(xCoord == stackX && zCoord == stackZ) &&
-				world.getBlock(xCoord, y, zCoord) == TFCBlocks.metalSheet && world.getTileEntity(xCoord, y, zCoord) instanceof TEMetalSheet)
+				world.getBlock(xCoord, y, zCoord) == TFCBlocks.metalSheet)// && world.getTileEntity(xCoord, y, zCoord) instanceof TEMetalSheet)
 		{
-			TEMetalSheet te = (TEMetalSheet)world.getTileEntity(xCoord, y, zCoord);
-			if(!te.northExists() || !isValidMetalSheet(te))
-				return false;
-			count++;
+                        TileEntity ate = world.getTileEntity(xCoord, y, zCoord);
+                        if (ate instanceof TEMetalSheet) {
+                            TEMetalSheet te = (TEMetalSheet) ate;
+                            if(!te.northExists() || !isValidMetalSheet(te))
+                                    return false;
+                            count++;
+                        }    
 		}
 		return count >= 3;
 	}

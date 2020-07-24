@@ -142,11 +142,11 @@ public class BlockForge extends BlockTerraContainer
 	@Override
 	public void randomDisplayTick(World world, int i, int j, int k, Random random)
 	{
-		if (this == TFCBlocks.forge)
-		{
-			return;
-		}
-		else
+		//if (this != TFCBlocks.forge) return;
+                TileEntity ate = world.getTileEntity(i, j, k);
+                float fireTemp = ate instanceof TEForge ? ((TEForge) ate).fireTemp : 0;
+                
+                if (fireTemp > 1) // burning
 		{
 			float f = i + 0.5F;
 			float f1 = j + 0.9F + random.nextFloat() * 6F / 16F;
@@ -156,15 +156,18 @@ public class BlockForge extends BlockTerraContainer
 			float f5 = random.nextFloat() * -0.6F;
 			float f6 = random.nextFloat() * -0.6F;
 			world.spawnParticle("smoke", f+f4 - 0.3F, f1,  f2 + f5 + 0.3F, 0.0D, 0.0D, 0.0D);
-			world.spawnParticle("flame", f+f4 - 0.3F, f1,  f2 + f5 + 0.3F, 0.0D, 0.0D, 0.0D);
-			world.spawnParticle("smoke", f+f5 + 0.3F , f1, f2 + f4 - 0.3F, 0.0D, 0.0D, 0.0D);
-			world.spawnParticle("flame", f+f5 + 0.3F , f1, f2 + f4 - 0.3F, 0.0D, 0.0D, 0.0D);
+                        if (fireTemp > 100) {
+                            world.spawnParticle("flame", f+f4 - 0.3F, f1,  f2 + f5 + 0.3F, 0.0D, 0.0D, 0.0D);
+                        }
+                        if (fireTemp > 200) {
+                            world.spawnParticle("smoke", f+f5 + 0.3F , f1, f2 + f4 - 0.3F, 0.0D, 0.0D, 0.0D);
+                            world.spawnParticle("flame", f+f5 + 0.3F , f1, f2 + f4 - 0.3F, 0.0D, 0.0D, 0.0D);
+                        }
+                        if (fireTemp > 750)
+                            world.spawnParticle("flame", f+f5 + 0.3F , f1, f2 + f6 + 0.2F, 0.0D, 0.0D, 0.0D);
 
-			if (((TEForge)world.getTileEntity(i, j, k)).fireTemp > 550)
-			{
-				world.spawnParticle("flame", f+f5 + 0.3F , f1, f2 + f6 + 0.2F, 0.0D, 0.0D, 0.0D);
-				world.spawnParticle("flame", f+f4 - 0.3F , f1, f2 + f6 + 0.1F, 0.0D, 0.0D, 0.0D);
-			}
+                        if (fireTemp > 1000)
+                            world.spawnParticle("flame", f+f4 - 0.3F , f1, f2 + f6 + 0.1F, 0.0D, 0.0D, 0.0D);                        
 		}
 	}
 

@@ -81,10 +81,12 @@ public class BlockWoodConstruct extends BlockTerraContainer implements ICustomCo
 	{
 		List<ItemStack> ret = new ArrayList<ItemStack>();
 
-		if(!world.isRemote && (TEWoodConstruct)world.getTileEntity(x, y, z)!=null)
+		if(!world.isRemote)// && (TEWoodConstruct)world.getTileEntity(x, y, z)!=null
 		{
-			TEWoodConstruct te = (TEWoodConstruct)world.getTileEntity(x, y, z);
-			ret = te.getDrops();
+                        TileEntity ate = world.getTileEntity(x, y, z);
+                        if (ate instanceof TEWoodConstruct) {
+                            ret = ((TEWoodConstruct) ate).getDrops();
+                        }
 		}
 		return (ArrayList<ItemStack>) ret;
 	}

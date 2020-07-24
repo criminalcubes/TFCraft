@@ -106,7 +106,10 @@ public class BlockFoodPrep extends BlockTerraContainer
 		{
 			if(!world.isSideSolid(i, j - 1, k, ForgeDirection.UP))
 			{
-				((TEFoodPrep)world.getTileEntity(i, j, k)).ejectContents();
+                                TileEntity ate = world.getTileEntity(i, j, k);
+                                if (ate instanceof TEFoodPrep)
+                                    ((TEFoodPrep)ate).ejectContents();
+
 				world.setBlockToAir(i, j, k);
 				return;
 			}
@@ -139,13 +142,14 @@ public class BlockFoodPrep extends BlockTerraContainer
 
 	//public void onBlockRemoval(World par1World, int par2, int par3, int par4) {Eject(par1World,par2,par3,par4);}
 
-	public void eject(World par1World, int par2, int par3, int par4)
+        public void eject(World world, int x, int y, int z)
 	{
-		if (par1World.getTileEntity(par2, par3, par4) instanceof TEFoodPrep)
+                TileEntity ate = world.getTileEntity(x, y, z);
+		if (ate instanceof TEFoodPrep)
 		{
-			TEFoodPrep te = (TEFoodPrep)par1World.getTileEntity(par2, par3, par4);
+			TEFoodPrep te = (TEFoodPrep) ate;
 			te.ejectContents();
-			par1World.removeTileEntity(par2, par3, par4);
+			world.removeTileEntity(x, y, z);
 		}
 	}
 

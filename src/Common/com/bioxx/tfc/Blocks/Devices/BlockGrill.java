@@ -102,8 +102,10 @@ public class BlockGrill extends BlockTerraContainer
 	@Override
 	public void setBlockBoundsBasedOnState(IBlockAccess access, int x, int y, int z)
 	{
-		if (access.getTileEntity(x, y, z) != null && access.getTileEntity(x, y, z) instanceof TEGrill)
-			this.setBlockBoundsForBlockRender(access.getBlockMetadata(x, y, z), ((TEGrill) access.getTileEntity(x, y, z)).data);
+                TileEntity ate = access.getTileEntity(x, y, z);
+                if (ate instanceof TEGrill) {
+                    this.setBlockBoundsForBlockRender(access.getBlockMetadata(x, y, z), ((TEGrill)ate).data);
+                }
 	}
 
 	@Override

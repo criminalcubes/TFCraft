@@ -39,27 +39,31 @@ public class BlockLeatherRack extends BlockTerraContainer
 	@Override
 	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer entityplayer, int side, float hitX, float hitY, float hitZ)
 	{
-		if (!world.isRemote && world.getTileEntity(x, y, z) instanceof TELeatherRack) // Instanceof check to avoid TE casting crashes.
+		if (!world.isRemote)// && world.getTileEntity(x, y, z) instanceof TELeatherRack) // Instanceof check to avoid TE casting crashes.
 		{
-			TELeatherRack te = (TELeatherRack) world.getTileEntity(x, y, z);
-			ItemStack equipped = entityplayer.getCurrentEquippedItem();
-			
-			if (te.workedArea != -1 && equipped != null && equipped.getItem() instanceof IKnife) // The player is trying to scrape a piece off the hide.
-			{
-				int coord = (int) Math.floor(hitX / 0.25f) + (int) Math.floor(hitZ / 0.25f) * 4; // Get location of spot being scraped.
-				if (((te.workedArea >> coord) & 1) == 0) // If the area hasn't been scraped yet
-				{
-					te.workArea(coord); // Scrape the spot
-					NBTTagCompound nbt = new NBTTagCompound();
-					nbt.setShort("workedArea", te.workedArea); // Save the scraped spot to NBT
-					te.broadcastPacketInRange(te.createDataPacket(nbt));
-					equipped.damageItem(1, entityplayer); // Damage the knife
-				}
-			}
-			else // Any other situation where the block is clicked, but the player is not properly trying to scrape a hide.
-			{
-				world.setBlockToAir(x, y, z); // Spawns any existing hides from the block as entities, and destroys the block and TE.
-			}
+                        TileEntity ate = world.getTileEntity(x, y, z);
+                        if (ate instanceof TELeatherRack) 
+                        {
+                            TELeatherRack te = (TELeatherRack) ate;//world.getTileEntity(x, y, z);
+                            ItemStack equipped = entityplayer.getCurrentEquippedItem();
+
+                            if (te.workedArea != -1 && equipped != null && equipped.getItem() instanceof IKnife) // The player is trying to scrape a piece off the hide.
+                            {
+                                    int coord = (int) Math.floor(hitX / 0.25f) + (int) Math.floor(hitZ / 0.25f) * 4; // Get location of spot being scraped.
+                                    if (((te.workedArea >> coord) & 1) == 0) // If the area hasn't been scraped yet
+                                    {
+                                            te.workArea(coord); // Scrape the spot
+                                            NBTTagCompound nbt = new NBTTagCompound();
+                                            nbt.setShort("workedArea", te.workedArea); // Save the scraped spot to NBT
+                                            te.broadcastPacketInRange(te.createDataPacket(nbt));
+                                            equipped.damageItem(1, entityplayer); // Damage the knife
+                                    }
+                            }
+                            else // Any other situation where the block is clicked, but the player is not properly trying to scrape a hide.
+                            {
+                                    world.setBlockToAir(x, y, z); // Spawns any existing hides from the block as entities, and destroys the block and TE.
+                            }
+                        }
 		}
 
 		if (!canBlockStay(world, x, y, z)) // For when players attempt to scrape a leather rack that should not exist (cheated in, no log underneath, etc).
@@ -97,16 +101,20 @@ public class BlockLeatherRack extends BlockTerraContainer
 	@Override
 	public void onBlockPreDestroy(World world, int i, int j, int k, int meta) 
 	{
-		if (!world.isRemote && world.getTileEntity(i, j, k) instanceof TELeatherRack) // Instanceof check to avoid TE casting crashes.
-		{
-			TELeatherRack te = (TELeatherRack)world.getTileEntity(i, j, k);
-			if (te.leatherItem != null) // Only spawn a hide if the leather rack has a hide stored in it.
-			{
-				EntityItem ei = new EntityItem(world, i, j, k, te.leatherItem);
-				ei.motionX = 0;
-				ei.motionZ = 0;
-				world.spawnEntityInWorld(ei);
-			}
+		if (!world.isRemote)// && world.getTileEntity(i, j, k) instanceof TELeatherRack) // Instanceof check to avoid TE casting crashes.
+		{ 
+                        TileEntity ate = world.getTileEntity(i, j, k);
+                        if (ate instanceof TELeatherRack) 
+                        {
+                            TELeatherRack te = (TELeatherRack)ate;//world.getTileEntity(i, j, k);
+                            if (te.leatherItem != null) // Only spawn a hide if the leather rack has a hide stored in it.
+                            {
+                                    EntityItem ei = new EntityItem(world, i, j, k, te.leatherItem);
+                                    ei.motionX = 0;
+                                    ei.motionZ = 0;
+                                    world.spawnEntityInWorld(ei);
+                            }
+                        }
 		}
 	}
 

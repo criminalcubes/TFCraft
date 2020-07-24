@@ -86,7 +86,11 @@ public class BlockStand2 extends BlockStand implements IMultipleBlock, IEquipabl
 			world.setBlock(i,j+1,k,this);
 			world.setBlockMetadataWithNotify(i, j+1, k, is.getItemDamage(),0);
 			world.setTileEntity(i, j+1, k, new TEStand());
-			((TEStand)world.getTileEntity(i, j+1, k)).isTop = true;
+			//((TEStand)world.getTileEntity(i, j+1, k)).isTop = true;
+                        TileEntity ate = world.getTileEntity(i, j+1, k);
+                        if (ate instanceof TEStand)
+                            ((TEStand)ate).isTop = true;
+                        
 		}
 	}
 

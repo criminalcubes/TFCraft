@@ -5,6 +5,7 @@ import java.util.List;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
@@ -50,11 +51,14 @@ public class ItemFruitTreeSapling extends ItemTerra
 				stack.setItemDamage(damage);
 			}
 			world.setBlock(x, y + 1, z, TFCBlocks.fruitTreeWood, damage, 0x2);
-
-			((TEFruitTreeWood)world.getTileEntity(x, y + 1, z)).setTrunk(true);
-			((TEFruitTreeWood)world.getTileEntity(x, y + 1, z)).setHeight(0);
-			((TEFruitTreeWood)world.getTileEntity(x, y + 1, z)).initBirth();
-
+                        TileEntity ate = world.getTileEntity(x, y+1, z);
+                        if (ate instanceof TEFruitTreeWood) 
+                        {
+                            TEFruitTreeWood teft = (TEFruitTreeWood) ate;
+                            teft.setTrunk(true);
+                            teft.setHeight(0);
+                            teft.initBirth();
+                        }
 			stack.stackSize = stack.stackSize - 1;
 			return true;
 		}

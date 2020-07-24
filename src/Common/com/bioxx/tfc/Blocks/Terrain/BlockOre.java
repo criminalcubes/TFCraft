@@ -217,8 +217,10 @@ public class BlockOre extends BlockCollapsible
 	{
 		if(!world.isRemote)
 		{
-			TEOre te = (TEOre)world.getTileEntity(x, y, z);
-			Random random = new Random();
+                        TileEntity ate = world.getTileEntity(x, y, z);
+                        if (!(ate instanceof TEOre)) return;
+			TEOre te = (TEOre)ate;//world.getTileEntity(x, y, z);
+			Random random = world.rand;// new Random();
 			ItemStack itemstack;
 			int meta = world.getBlockMetadata(x, y, z);
 			int ore = getOreGrade(te, meta);

@@ -6,6 +6,7 @@ import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
@@ -58,8 +59,11 @@ public class ItemRawHide extends ItemLooseRock
 			{
 				if(world.getBlock(x, y, z) instanceof BlockLogHoriz && world.isAirBlock( x, y + 1, z ) && world.setBlock(x, y+1, z, TFCBlocks.leatherRack))
 				{
-					TELeatherRack te = (TELeatherRack)world.getTileEntity(x, y+1, z);
-					te.setLeather(itemstack);
+                                        TileEntity ate = world.getTileEntity(x, y+1, z);//world.getTileEntity(x, y+1, z);
+                                        if (ate instanceof TELeatherRack)
+                                        {					
+                                            ((TELeatherRack)ate).setLeather(itemstack);
+                                        }
 				}
 
 			}
