@@ -91,12 +91,12 @@ public class BlockEarlyBloomery extends BlockTerraContainer implements ICustomCo
 	{
 		if(world.isAirBlock(x, y, z))
 			return true;
-
-		if (world.getTileEntity(x, y, z) instanceof TEBloomery) // Prevent ClassCastException
+                TileEntity ate = world.getTileEntity(x, y, z);
+		if (ate instanceof TEBloomery) // Prevent ClassCastException
 		{
 			boolean flipped = false;
 			int dir = world.getBlockMetadata(x, y, z) & 3;
-			TEBloomery te = (TEBloomery) world.getTileEntity(x, y, z);
+			TEBloomery te = (TEBloomery) ate;
 
 			if (te != null)
 				flipped = te.isFlipped;
@@ -493,9 +493,10 @@ public class BlockEarlyBloomery extends BlockTerraContainer implements ICustomCo
 	{
 		int meta = world.getBlockMetadata(x, y, z);
 		int dir = meta & 3;
-		if (world.getTileEntity(x, y, z) instanceof TEBloomery)
+                TileEntity ate = world.getTileEntity(x, y, z);
+		if (ate instanceof TEBloomery)
 		{
-			TEBloomery te = (TEBloomery) world.getTileEntity(x, y, z);
+			TEBloomery te = (TEBloomery) ate;
 			if (te.isFlipped)
 				dir = flipDir(dir);
 		}

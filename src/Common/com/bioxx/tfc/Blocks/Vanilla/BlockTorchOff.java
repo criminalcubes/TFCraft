@@ -16,6 +16,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import com.bioxx.tfc.Core.TFC_Time;
 import com.bioxx.tfc.TileEntities.TELightEmitter;
 import com.bioxx.tfc.api.TFCBlocks;
+import net.minecraft.tileentity.TileEntity;
 
 public class BlockTorchOff extends BlockTorch
 {
@@ -51,9 +52,10 @@ public class BlockTorchOff extends BlockTorch
 			{
 				int meta = world.getBlockMetadata(x, y, z);
 				world.setBlock(x, y, z, TFCBlocks.torch, meta, 3);
-				if (world.getTileEntity(x, y, z) instanceof TELightEmitter)
+                                TileEntity ate = world.getTileEntity(x, y, z);
+				if (ate instanceof TELightEmitter)
 				{
-					TELightEmitter te = (TELightEmitter) world.getTileEntity(x, y, z);
+					TELightEmitter te = (TELightEmitter) ate;
 					te.hourPlaced = (int) TFC_Time.getTotalHours();
 				}
 			}

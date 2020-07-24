@@ -89,9 +89,10 @@ public class BlockSapling extends BlockTerraContainer
 		if (worldGen != null && !worldGen.generate(world, rand, i, j, k))
 		{
 			world.setBlock(i, j, k, this, meta, 3);
-			if (world.getTileEntity(i, j, k) instanceof TESapling)
+                        TileEntity ate = world.getTileEntity(i, j, k);
+			if (ate instanceof TESapling)
 			{
-				TESapling te = (TESapling) world.getTileEntity(i, j, k);
+				TESapling te = (TESapling) ate;
 				te.growTime = timestamp;
 				te.enoughSpace = false;
 				te.markDirty();
@@ -124,10 +125,11 @@ public class BlockSapling extends BlockTerraContainer
 			growSpeed = 1.4f;
 		else if(meta == 9 || meta == 14|| meta == 15)
 			growSpeed = 1.6f;
-
-		if (world.getTileEntity(i, j, k) instanceof TESapling)
+                
+                TileEntity ate = world.getTileEntity(i, j, k);
+		if (ate instanceof TESapling)
 		{
-			TESapling te = (TESapling) world.getTileEntity(i, j, k);
+			TESapling te = (TESapling) ate;
 
 			// Set the growTime tick timestamp to be 7-11.2 days times config multiplier from now, plus up to an extra day.
 			if (te != null && te.growTime == 0)

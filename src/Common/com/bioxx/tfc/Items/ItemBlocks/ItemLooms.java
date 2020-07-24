@@ -16,6 +16,7 @@ import com.bioxx.tfc.TileEntities.TELoom;
 import com.bioxx.tfc.api.Constant.Global;
 import com.bioxx.tfc.api.Enums.EnumSize;
 import com.bioxx.tfc.api.Enums.EnumWeight;
+import net.minecraft.tileentity.TileEntity;
 
 public class ItemLooms extends ItemTerraBlock
 {
@@ -60,10 +61,11 @@ public class ItemLooms extends ItemTerraBlock
 		{
 			field_150939_a.onBlockPlacedBy(world, x, y, z, player, stack);
 			field_150939_a.onPostBlockPlaced(world, x, y, z, 0);
-
-			if (world.getTileEntity(x, y, z) instanceof TELoom)
+                        
+                        TileEntity ate = world.getTileEntity(x, y, z);
+			if (ate instanceof TELoom)
 			{
-				TELoom te = (TELoom) world.getTileEntity(x, y, z);
+				TELoom te = (TELoom) ate;
 				if (te != null)
 				{
 					te.loomType = metadata;

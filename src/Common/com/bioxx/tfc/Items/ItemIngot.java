@@ -101,10 +101,10 @@ public class ItemIngot extends ItemTerra implements ISmeltable
 		boolean fullStack = true;
 
 		TEIngotPile te = null;
-
-		if (world.getTileEntity(x, y, z) instanceof TEIngotPile && world.getBlock(x,y,z) == TFCBlocks.ingotPile)
+                TileEntity ate = world.getTileEntity(x, y, z);
+		if (ate instanceof TEIngotPile && world.getBlock(x,y,z) == TFCBlocks.ingotPile)
 		{
-			te = (TEIngotPile)world.getTileEntity(x, y, z);
+			te = (TEIngotPile) ate;
 			if (te.contentsMatch(0,itemstack) && te.getStackInSlot(0).stackSize < te.getInventoryStackLimit())
 			{
 				fullStack = false;

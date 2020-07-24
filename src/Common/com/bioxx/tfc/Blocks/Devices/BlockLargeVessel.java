@@ -128,10 +128,10 @@ public class BlockLargeVessel extends BlockBarrel
 			{
 				return false;
 			}
-
-			if(world.getTileEntity(x, y, z) != null)
+                        TileEntity ate = world.getTileEntity(x, y, z);
+			if(ate instanceof TEVessel)
 			{
-				TEVessel te = (TEVessel)(world.getTileEntity(x, y, z));
+				TEVessel te = (TEVessel)ate;
 
 				if(!handleInteraction(player, te))
 				{

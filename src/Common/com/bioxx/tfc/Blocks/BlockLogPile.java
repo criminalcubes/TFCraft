@@ -199,9 +199,10 @@ public class BlockLogPile extends BlockTerraContainer
 	@Override
 	public void updateTick(World world, int x, int y, int z, Random rand)
 	{
-		if (world.getTileEntity(x, y, z) instanceof TELogPile)
+		TileEntity ate = world.getTileEntity(x, y, z);
+                if (ate instanceof TELogPile)
 		{
-			TELogPile te = (TELogPile) world.getTileEntity(x, y, z);
+			TELogPile te = (TELogPile) ate;
 
 			if (te.isOnFire && te.fireTimer + TFCOptions.charcoalPitBurnTime < TFC_Time.getTotalHours())
 			{
@@ -214,7 +215,8 @@ public class BlockLogPile extends BlockTerraContainer
 	@SideOnly(Side.CLIENT)
 	public void randomDisplayTick(World world, int x, int y, int z, Random rand)
 	{
-		if (world.getTileEntity(x, y, z) instanceof TELogPile && ((TELogPile) world.getTileEntity(x, y, z)).isOnFire)
+                TileEntity ate = world.getTileEntity(x, y, z);
+		if (ate instanceof TELogPile && ((TELogPile) ate).isOnFire)
 		{
 			double centerX = x + 0.5F;
 			double centerY = y + 2F;

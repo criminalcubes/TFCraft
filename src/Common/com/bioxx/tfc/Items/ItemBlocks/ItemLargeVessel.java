@@ -10,6 +10,7 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.MovingObjectPosition.MovingObjectType;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 
 import net.minecraftforge.common.util.ForgeDirection;
@@ -222,10 +223,10 @@ public class ItemLargeVessel extends ItemTerraBlock implements IEquipable
 			{
 				return false;
 			}
-
-			if (world.getTileEntity(x, y, z) instanceof TEPottery)
+                        TileEntity ate = world.getTileEntity(x, y, z);
+			if (ate instanceof TEPottery)
 			{
-				TEPottery te = (TEPottery) world.getTileEntity(x, y, z);
+				TEPottery te = (TEPottery) ate;
 				if(te.canAddItem(0))
 				{
 					te.inventory[0] = stack.copy();

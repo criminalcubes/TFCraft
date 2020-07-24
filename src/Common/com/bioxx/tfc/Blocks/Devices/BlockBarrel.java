@@ -170,9 +170,10 @@ public class BlockBarrel extends BlockTerraContainer
 	@Override
 	public void onBlockDestroyedByExplosion(World world, int x, int y, int z, Explosion exp)
 	{
-		if (world.getTileEntity(x, y, z) instanceof TEBarrel)
+                TileEntity ate = world.getTileEntity(x, y, z);
+		if (ate instanceof TEBarrel)
 		{
-			TEBarrel te = (TEBarrel) world.getTileEntity(x, y, z);
+			TEBarrel te = (TEBarrel) ate;
 			// Only barrels, no large vessels. Requires at least 12 gunpowder for minimum blast strength of 1.
 			if (this == TFCBlocks.barrel && te != null && te.getGunPowderCount() >= 12 && te.getSealed())
 			{
@@ -230,9 +231,10 @@ public class BlockBarrel extends BlockTerraContainer
 	@Override
 	public void onNeighborBlockChange(World world, int x, int y, int z, Block block)
 	{
-		if (world.getTileEntity(x, y, z) instanceof TEBarrel)
+                TileEntity ate = world.getTileEntity(x, y, z);
+		if (ate instanceof TEBarrel)
 		{
-			TEBarrel te = (TEBarrel) world.getTileEntity(x, y, z);
+			TEBarrel te = (TEBarrel) ate;
 			// Only barrels, no large vessels. Requires at least 12 gunpowder for minimum blast strength of 1.
 			if (this == TFCBlocks.barrel && te != null && te.getGunPowderCount() >= 12 && te.getSealed())
 			{
@@ -304,10 +306,10 @@ public class BlockBarrel extends BlockTerraContainer
 			{
 				return false;
 			}
-
-			if (world.getTileEntity(x, y, z) instanceof TEBarrel)
+                        TileEntity ate = world.getTileEntity(x, y, z);    
+			if (ate instanceof TEBarrel)
 			{
-				TEBarrel te = (TEBarrel) world.getTileEntity(x, y, z);
+				TEBarrel te = (TEBarrel) ate;
 
 				if (this == TFCBlocks.barrel && te.getSealed() && te.getGunPowderCount() >= 12
 						&& player.getCurrentEquippedItem() != null && player.getCurrentEquippedItem().getItem() instanceof ItemFlintAndSteel)

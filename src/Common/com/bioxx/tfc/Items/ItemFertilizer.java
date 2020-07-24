@@ -28,7 +28,7 @@ public class ItemFertilizer extends ItemTerra
 					return tef.fertilize(itemstack, false);
 				}
 			}
-			else if(world.getTileEntity(x, y, z) instanceof TECrop && TFC_Core.isFarmland(world.getBlock(x, y - 1, z)))
+			else if(TFC_Core.isFarmland(world.getBlock(x, y - 1, z)) && world.getTileEntity(x, y, z) instanceof TECrop)
 			{
 				TEFarmland tef = (TEFarmland)world.getTileEntity(x, y - 1, z);
 				if (tef.nutrients[3] != tef.getSoilMax())

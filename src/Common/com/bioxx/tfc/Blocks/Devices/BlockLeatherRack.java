@@ -73,9 +73,10 @@ public class BlockLeatherRack extends BlockTerraContainer
 	@Override
 	public boolean canBlockStay(World world, int x, int y, int z)
 	{
-		if (world.getTileEntity(x, y, z) instanceof TELeatherRack)
+                TileEntity ate = world.getTileEntity(x, y, z);
+		if (ate instanceof TELeatherRack)
 		{
-			TELeatherRack te = (TELeatherRack) world.getTileEntity(x, y, z);
+			TELeatherRack te = (TELeatherRack) ate;
 			if (te.leatherItem == null) // Leather racks that have no hide should not exist.
 			{
 				return false;

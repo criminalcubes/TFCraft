@@ -193,9 +193,10 @@ public class BlockFirepit extends BlockTerraContainer
 
 	public void eject(World world, int x, int y, int z)
 	{
-		if (world.getTileEntity(x, y, z) instanceof TEFirepit)
+                TileEntity ate = world.getTileEntity(x, y, z);
+		if (ate instanceof TEFirepit)
 		{
-			TEFirepit te = (TEFirepit)world.getTileEntity(x, y, z);
+			TEFirepit te = (TEFirepit) ate;
 			te.ejectContents();
 			world.removeTileEntity(x, y, z);
 		}

@@ -7,6 +7,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.item.Item;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.IBlockAccess;
@@ -168,14 +169,11 @@ public class BlockSlab extends BlockPartial
 	@Override
 	public boolean isSideSolid(IBlockAccess world, int x, int y, int z, ForgeDirection side)
 	{
-		TEPartial te = null;
-
-		if (world.getTileEntity(x, y, z) instanceof TEPartial)
-			te = (TEPartial) world.getTileEntity(x, y, z);
-
-		if(te == null)
-			return false;
-
+                TileEntity ate = world.getTileEntity(x, y, z);
+		if (!(ate instanceof TEPartial))
+                    return false;
+                
+		TEPartial te = (TEPartial) ate;
 		long data = te.extraData;
 
 		switch(side)

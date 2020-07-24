@@ -68,9 +68,10 @@ public class BlockMetalSheet extends BlockTerraContainer implements ICustomColli
 	@Override
 	public void onBlockPreDestroy(World world, int i, int j, int k, int meta) 
 	{
-		if (world.getTileEntity(i, j, k) instanceof TEMetalSheet)
+                TileEntity ate = world.getTileEntity(i, j, k);
+		if (ate instanceof TEMetalSheet)
 		{
-			TEMetalSheet te = (TEMetalSheet) world.getTileEntity(i, j, k);
+			TEMetalSheet te = (TEMetalSheet) ate;
 			if (te.sheetStack != null)
 			{
 				int stack = 0;

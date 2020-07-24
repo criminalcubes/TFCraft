@@ -50,24 +50,26 @@ public class BlockBlastFurnace extends BlockTerraContainer
 		ItemStack equippedItem = entityplayer.getCurrentEquippedItem();
 		if(!world.isRemote)
 		{
-		if(!canBlockStay(world,i,j,k))
-		{
-			world.setBlockToAir(i, j, k);
-			world.spawnEntityInWorld(new EntityItem(world,i,j,k, new ItemStack(this, 1)));
-		}
-		else if(world.getTileEntity(i, j, k) != null)
-		{
-			TEBlastFurnace te = (TEBlastFurnace)world.getTileEntity(i, j, k);
+                    if(!canBlockStay(world,i,j,k))
+                    {
+                            world.setBlockToAir(i, j, k);
+                            world.spawnEntityInWorld(new EntityItem(world,i,j,k, new ItemStack(this, 1)));
+                    }
+                    else //if(world.getTileEntity(i, j, k) != null)
+                    {
+                            TileEntity ate = world.getTileEntity(i, j, k);
+                            if (ate instanceof TEBlastFurnace) {
+                                TEBlastFurnace te = (TEBlastFurnace)ate;
+                                if(te.isValid)
+                                {
+                                        if(equippedItem != null && (equippedItem.getItem() == TFCItems.fireStarter || equippedItem.getItem() == TFCItems.flintSteel))
+                                                if(te.canLight())
+                                                        entityplayer.getCurrentEquippedItem().damageItem(1,entityplayer);
 
-			if(te.isValid)
-			{
-				if(equippedItem != null && (equippedItem.getItem() == TFCItems.fireStarter || equippedItem.getItem() == TFCItems.flintSteel))
-					if(te.canLight())
-						entityplayer.getCurrentEquippedItem().damageItem(1,entityplayer);
-
-				entityplayer.openGui(TerraFirmaCraft.instance, 26, world, i, j, k);
-			}
-		}
+                                        entityplayer.openGui(TerraFirmaCraft.instance, 26, world, i, j, k);
+                                }
+                            }
+                    }
 		}
 		return true;
 	}
